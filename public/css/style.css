@@ -1,0 +1,38 @@
+td {
+	width:30px;
+	height:30px;
+	-webkit-box-sizing: border-box;
+}
+
+tr:first-child > td, td:first-child {
+	padding-left: 10px;
+}
+
+.tile:hover, .tile-hover, .placed-tile {
+	background-color: #464545;
+	cursor:pointer;
+}
+
+table {
+	padding:0;
+	padding:0;
+
+	border:1px solid white;
+}
+
+table td {
+	border:1px solid white !important;
+	
+}
+
+.hit-tile {			
+	background-color: tomato;
+}
+
+.missed-tile {
+	background: cornflowerblue;
+}
+
+#messages { list-style-type: none; margin: 0; padding: 0; overflow-y: scroll;margin-bottom: 10px;}
+#messages li { padding: 5px 10px; word-wrap: break-word;}
+#messages li:nth-child(odd) { background: #222222; }
