@@ -1,11 +1,14 @@
 var socket = io();
 
 
-socket.emit('init', window.location.pathname.substring(1, window.location.pathname.length));
+//socket.emit('init', window.location.pathname.substring(1, window.location.pathname.length));
+socket.emit('init', () -> {
+	console.log('ENVIANDO O REQUEST PARA O SOCKET');
+	window.location.pathname.substring(1, window.location.pathname.length)
+});
 
 socket.on('init', function(obj) {
 
-    //console.log(obj.players.length);
     console.log(obj.players);
     vm.ships = obj.ships;
     vm.room = window.location + obj.room;
