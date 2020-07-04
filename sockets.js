@@ -4,9 +4,9 @@ var uniqid = require('uniqid');
 module.exports.listen = function(http, rooms) {
 
     var ships = [
-        { 'type': 'Aircraft carrier', 'size': 5, 'location': [], 'hits': 0, 'amount': 2},
+        { 'type': 'Aircraft carrier', 'size': 5, 'location': [], 'hits': 0, 'amount': 0},
         { 'type': 'Battleship', 'size': 4, 'location': [], 'hits': 0, 'amount': 0},
-        { 'type': 'Submarine', 'size': 3, 'location': [], 'hits': 0, 'amount': 0},
+        { 'type': 'Submarine', 'size': 3, 'location': [], 'hits': 0, 'amount': 3},
         { 'type': 'Cruiser', 'size': 3, 'location': [], 'hits': 0, 'amount': 0},
         { 'type': 'Destroyer', 'size': 2, 'location': [], 'hits': 0, 'amount': 0}
     ];

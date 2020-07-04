@@ -1,118 +1,440 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<div id="app">
+  <router-view></router-view>
+</div>
 
+<script>
+$("#app").load("logo.vue"); 
+alert('AHHH')
+//import Component from 'vue-class-component';
+//import logo from './tmp/logo.html';
+//import logoPage from 'C:/Users/erick/OneDrive/Documentos/GitHub/SeaOfBattles/logo';
+
+// 0. If using a module system (e.g. via vue-cli), import Vue and VueRouter
+// and then call `Vue.use(VueRouter)`.
+
+// 1. Define route components.
+// These can be imported from other files
+const logoPage = { template: '\
+<div>\
+	<router-link to="/loginPage">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/logo-sob.svg" alt="SEA OF BATTLES">\
+	</router-link>\
+</div>' }
+const loginPage = { template: '\
+<div>\
+  <form class="modal-content animate" action="ACAO-DE-LOGIN.py" method="post">\
+    <div class="imgcontainer">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/logo-sob.svg" alt="SEA OF BATTLES" class="avatar">\
+    </div>\
+\
+    <div class="container">\
+      <input type="text" placeholder="u s e r n a m e" name="uname" minlength="4" required>\
+\
+      <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+\
+      <button type="submit">ENTRAR</button>\
+\
+      <router-link to="/signUpPage">\
+        CADASTRE-SE\
+      </router-link>\
+    </div>\
+  </form>\
+</div>' }
+const signUpPage = { template: '\
+<div>\
+   <form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
+    <div class="imgcontainer">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/captain.svg" alt="AVATAR" class="avatar">\
+    </div>\
+\
+    <div class="container">\
+      <input type="email" placeholder="e - m a i l" name="uname" required>\
+\
+      <input type="text" placeholder="u s e r n a m e" name="psw" minlength="4" required>\
+\
+      <input type="text" placeholder="n i c k n a m e" name="uname" minlength="8" required>\
+\
+      <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+\
+      <button type="submit">CONFIRMAR</button>\
+    </div>\
+  </form>\
+</div>' }
+
+// 2. Define some routes
+// Each route should map to a component. The "component" can
+// either be an actual component constructor created via
+// `Vue.extend()`, or just a component options object.
+// We'll talk about nested routes later.
+const routes = [
+  { path: '/', component: logoPage },
+  { path: '/loginPage', component: loginPage },
+  { path: '/signUpPage', component: signUpPage }
+]
+
+// 3. Create the router instance and pass the `routes` option
+// You can pass in additional options here, but let's
+// keep it simple for now.
+const router = new VueRouter({
+  routes // short for `routes: routes`
+})
+
+// 4. Create and mount the root instance.
+// Make sure to inject the router with the router option to make the
+// whole app router-aware.
+const app = new Vue({
+  router
+}).$mount('#app')
+
+// Now the app has started!
+</script>
+
+<style>
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: ghostwhite;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: ghostwhite;
 }
 
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 10px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  text-align: center;
+input[type=text],
+input[type=email],
+input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 logo {
-  margin: 160px 0 12px 0;
-  display: flex;   
-  justify-content: center; 
+    margin: 160px 0 12px 0;
+    display: flex;
+    justify-content: center;
 }
 
 logo:hover {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
 button {
-  background-color: steelblue;
-  color: ghostwhite;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  font-weight:bold
+    background-color: steelblue;
+    color: ghostwhite;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold
 }
 
 button:hover {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
 .imgcontainer {
-  text-align: center;
-  margin: 24px 0 12px 0;
-  position: relative;
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
 }
 
 img.avatar {
-  width: 20%;
+    width: 20%;
 }
 
 .container {
-  text-align: center;
-  margin: 24px 0 12px 0;
-  padding: 16px;
+    text-align: center;
+    margin: 24px 0 12px 0;
+    padding: 16px;
 }
 
 span.psw {
-  float: right;
-  padding-top: 10px;
+    float: right;
+    padding-top: 10px;
 }
 
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: ghostwhite;
-  padding-top: 10px;
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: ghostwhite;
+    padding-top: 10px;
 }
 
 .modal-content {
-  background-color: ghostwhite;
-  margin: 2% auto 2% auto;
-  border: 1px solid steelblue;
-  width: 50%;
+    background-color: ghostwhite;
+    margin: 2% auto 2% auto;
+    border: 1px solid steelblue;
+    width: 50%;
 }
 
 .animate {
-  -webkit-animation: animatezoom 0.6s;
-  animation: animatezoom 0.6s
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
 }
 
 @-webkit-keyframes animatezoom {
-  from {-webkit-transform: scale(0)} 
-  to {-webkit-transform: scale(1)}
+    from {
+        -webkit-transform: scale(0)
+    }
+
+    to {
+        -webkit-transform: scale(1)
+    }
 }
-  
+
 @keyframes animatezoom {
-  from {transform: scale(0)} 
-  to {transform: scale(1)}
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
 }
 
 @media screen and (max-width: 300px) {
-  span.psw {
-     display: block;
-     float: none;
-  }
+    span.psw {
+        display: block;
+        float: none;
+    }
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: ghostwhite;
+}
+
+input[type=text],
+input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+logo {
+    margin: 160px 0 12px 0;
+    display: flex;
+    justify-content: center;
+}
+
+logo:hover {
+    opacity: 0.8;
+}
+
+button {
+    background-color: steelblue;
+    color: ghostwhite;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+img.avatar {
+    width: 20%;
+}
+
+.container {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: ghostwhite;
+    padding-top: 10px;
+}
+
+.modal-content {
+    background-color: ghostwhite;
+    margin: 2% auto 2% auto;
+    border: 1px solid steelblue;
+    width: 50%;
+}
+
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {
+        -webkit-transform: scale(0)
+    }
+
+    to {
+        -webkit-transform: scale(1)
+    }
+}
+
+@keyframes animatezoom {
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: ghostwhite;
+}
+
+input[type=text],
+input[type=email],
+input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+logo {
+    margin: 160px 0 12px 0;
+    display: flex;
+    justify-content: center;
+}
+
+logo:hover {
+    opacity: 0.8;
+}
+
+button {
+    background-color: steelblue;
+    color: ghostwhite;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+img.avatar {
+    width: 20%;
+    border-radius: 50%;
+}
+
+.container {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: ghostwhite;
+    padding-top: 10px;
+}
+
+.modal-content {
+    background-color: ghostwhite;
+    margin: 2% auto 2% auto;
+    border: 1px solid steelblue;
+    width: 50%;
+}
+
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {
+        -webkit-transform: scale(0)
+    }
+
+    to {
+        -webkit-transform: scale(1)
+    }
+}
+
+@keyframes animatezoom {
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
 }
 </style>
-</head>
-<body>
-
-<logo onclick="window.location.href='login.html';">
-    <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/logo-sob.svg" alt="SEA OF BATTLES">
-</logo>
-
-</body>
-</html>
