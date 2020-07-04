@@ -2,7 +2,7 @@
 
 ## Installation
 
-    git clone https://github.com/zasei/Battleship.git
+    git clone https://github.com/erickcastorino/SeaOfBattles.git
     cd Battleship && npm install && bower install
     node app.js
     
