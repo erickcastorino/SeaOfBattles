@@ -20,36 +20,43 @@ alert('AHHH')
 const logoPage = { template: '\
 <div class="index">\
 	<router-link class="logo-index" to="/loginPage">\
-		<img  src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo-sob.svg" alt="SEA OF BATTLES">\
+		<img  src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg" alt="SEA OF BATTLES">\
 	</router-link>\
 </div>' }
 const loginPage = { template: '\
 <div>\
-  <form class="modal-content animate" action="ACAO-DE-LOGIN.py" method="post">\
+   <form class="modal-content animate" action="ACAO-DE-LOGIN.py" method="post">\
     <div class="imgcontainer">\
-      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/logo-sob.svg" alt="SEA OF BATTLES" class="avatar">\
+        <router-link to="/">\
+            <span class="close">&times;</span>\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" alt="SEA OF BATTLES" class="avatar-login">\
+        </router-link>\
     </div>\
 \
     <div class="container">\
-      <input type="text" placeholder="u s e r n a m e" name="uname" minlength="4" required>\
+      <input type="text" placeholder="u s e r n a m e" name="username" minlength="4" required>\
 \
       <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
 \
-      <button type="submit">ENTRAR</button>\
+      <button type="submit" class="submit-button">ENTRAR</button>\
 \
-      <router-link to="/signUpPage">\
-        CADASTRE-SE\
-      </router-link>\
+    <router-link to="/signUpPage">\
+        <button type="button"  class="submit-button">CADASTRE-SE</button>\
+    </router-link>\
+    <router-link to="/signUpPage">\
+        <button type="button"  class="submit-button">wodjiojfijeijf</button>\
+    </router-link>\
     </div>\
   </form>\
-</div>' }
+</div>\
+' }
 const signUpPage = { template: '\
-<div>\
-   <form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
+<form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
     <div class="imgcontainer">\
-      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/logo/captain.svg" alt="AVATAR" class="avatar">\
+      <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg" class="avatar" id="imgClickAndChange" onclick="changeImage()" usemap="#SUB15" />\
+      <strong><p style="color: steelblue">CLIQUE NO AVATAR PARA ALTERAR</p></strong>\
     </div>\
-\
     <div class="container">\
       <input type="email" placeholder="e - m a i l" name="uname" required>\
 \
@@ -59,10 +66,42 @@ const signUpPage = { template: '\
 \
       <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
 \
-      <button type="submit">CONFIRMAR</button>\
+      <button type="submit" class="submit-button">CONFIRMAR</button>\
     </div>\
-  </form>\
-</div>' }
+  </form>' }
+
+  const mainPage = { template: '\
+  <div class="main">\
+	<div class="sidenav"> <br>\
+	  <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
+	  <a href="profile.html">EDITAR PERFIL</a><br><br>\
+	  <a href="store.html">LOJA DE BATALHA</a><br><br>\
+	  <a href="gold.html">COMPRAR OURO</a><br><br>\
+	  <a href="login.html">SAIR DO JOGO</a>\
+	</div>\
+\
+	<div class="btn-group" style="width: 80%; margin-left: 40%">\
+	  <button style="width:25%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	  <button style="width:25%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	</div>\
+\
+	<p> </p> <p> </p> <p> </p> <p> </p> <p> </p> <p> </p>\
+\
+	<div class="btn-group" style="width:100%">\
+	  <button onclick="window.location.href=\'start.html\';" style="width: 40%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/target.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	  <button onclick="window.location.href=\'search.html\';" style="width: 40%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/search.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	</div>\
+\
+</div>\
+' }
 
 // 2. Define some routes
 // Each route should map to a component. The "component" can
@@ -72,7 +111,8 @@ const signUpPage = { template: '\
 const routes = [
   { path: '/', component: logoPage },
   { path: '/loginPage', component: loginPage },
-  { path: '/signUpPage', component: signUpPage }
+  { path: '/signUpPage', component: signUpPage },
+  { path: '/mainPage', component: mainPage },
 ]
 
 // 3. Create the router instance and pass the `routes` option
@@ -89,7 +129,22 @@ const app = new Vue({
   router
 }).$mount('#app')
 
-// Now the app has started!
+var counter = 1;
+function changeImage(){
+    if(counter == 0){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
+        counter++;
+    }
+    else if(counter == 1){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
+        counter++;
+    }
+    else if(counter == 2){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
+        counter = 0;
+    }
+};
+
 </script>
 
 <style>
