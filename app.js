@@ -4,7 +4,9 @@ var http = require('http').Server(app);
 
 var Datastore = require('nedb'),
     rooms = new Datastore();
-var io = require('./sockets').listen(http, rooms);
+    users = new Datastore({filename:'users.db', autoload:true});
+
+var io = require('./sockets').listen(http, rooms, users);
 
 var port = 3000;
 var DEBUG = true;
