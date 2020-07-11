@@ -403,7 +403,17 @@ module.exports.listen = function(http, rooms, users) {
         })
 
         socket.on('cadastro', function(obj){
-            
+            user.findOne({'user':obj.user},function(err, res){				
+                if(obj.user===res.user){
+                    socket.emit('login', {status: 'erro', msg: 'Usuário já cadastrado'})
+                }
+				else{
+					const data = {...obj,coins:50,skins:{}}
+					user.insert({data}, function(err, res){
+						socket.emit('login', {status: 'sucesso', msg: 'Usuário cadastrado com sucesso'})
+					});
+				}			
+            });
         })
     });
     
