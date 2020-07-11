@@ -132,6 +132,7 @@ Vue.component('board', {
             var size = this.$root.selectedShip.size;
 
             var hoveredTile = document.querySelectorAll('.tile-hover');
+            alert('https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ this.$root.theme + '-'+ hoveredTile.length + '/' + 1 + '.png')
 
             var overlap = false;
             
