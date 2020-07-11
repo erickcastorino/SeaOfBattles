@@ -124,6 +124,7 @@ Vue.component('board', {
     methods: {
 
         placeShip: function(el) {
+            alert(this.$root.theme)
 
             if(this.$root.selectedShip == null || this.$root.selectedShip.amount == 0)
                 return;
@@ -279,12 +280,17 @@ var vm = new Vue({
         ready: false,
         playerState: null,
         canFire: false,
-        room: null
+        room: null,
+        componentKey: 0,
+        theme: 'viking'
     },
 
     methods: {
         setSelectedShip: function(ship) {
             this.selectedShip = ship;
+        },
+        reRender(){
+           this.forceUpdate()
         },
         sendMessage: function() {
             var tbox = document.querySelector('#messages');
