@@ -1,0 +1,639 @@
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/ship.js"></script>
+
+<div id="app">
+  <router-view></router-view>
+  <div class="container">
+    <template id="game">
+    <h2>Battleship</h2>
+    <div v-if="room != null && isHost" class="form-group">
+      <label class="control-label" for="share">Share this URL with a friend</label>
+      <input style="width: 250px;" class="form-control input-sm" onClick="this.select();" :value="room" type="text" id="share">
+    </div>
+    <h4 v-else>You joined a room.</h4><h4 style="display:inline;" v-show="opponentReady && ready && canFire" >Your turn</h4><h4 style="display:inline;"  v-show="opponentReady && ready && !canFire" >Opponent's turn</h4>
+    <div class="row">
+      <div class="col-md-4">
+
+        <h4>Your board <span v-if="!ready">Not ready</span><span v-else>Ready</span></h4>
+        <board :cols="10" :rows="10"></board>
+
+      </div>
+      <div class="col-md-4">
+      <h4>Opponent's board {{statusMessage}}</h4>
+        <opponent-board :cols="10" :rows="10"></board>
+      </div>
+      <div class="col-md-4">
+          <div class="well bs-component">
+            <form v-on:submit.prevent="sendMessage" class="form-horizontal">
+              <fieldset>
+                <legend>Chat</legend>
+                <div class="form-group">
+                <div class="col-lg-12">
+                  <ul id="messages" style="width:100%;height:200px;">
+                  </ul>
+                  </div>
+                  <div class="col-lg-9">
+                    <input type="text" class="form-control chatmessage" placeholder="Message">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+              </fieldset>
+            </form>
+        </div>
+  </div>
+      <div class="col-md-4">
+      <h3>Your ships <button @click="rotated = !rotated" type="button" class="btn btn-default btn-xs">Rotate ship {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
+      <p v-for="ship in ships">
+      <button @click="setSelectedShip(ship)" :disabled="ship.amount == 0" type="button" class="btn btn-default btn-xs">Select</button> {{ ship.type }} {{ ship.amount}}x</p>
+      </template>
+
+    </div>
+    <template id="board-template">
+        <table border="1">
+          <tr v-for="i in rows+1">
+            <template v-for="n in cols+1">
+              <td v-if="n == 0">{{ i == 0 ? '' : i}}</td>
+              <td v-if="i == 0 && n != 0">{{ n | convertChar }}</td>
+              <td @click="placeShip($event)"
+                  :data-cords="i + '' + n" 
+                  v-on:mouseleave="setDef($event)" 
+                  v-on:mouseover="changeStyle($event)" 
+                  class="tile" 
+                  v-if="i > 0 && n != cols">
+                    <img 
+                         src="https://i.ya-webdesign.com/images/perfect-circle-png-2.png" 
+                         width="100%" 
+                         height="100%" 
+                         :data-cords="i + '' + n +'_img'"></td>
+            </template>
+          </tr>
+        </table>
+    </template>
+    <template id="opponent-board-template">
+        <table border="1">
+          <tr v-for="i in rows+1">
+            <template v-for="n in cols+1">
+              <td v-if="n == 0">{{ i == 0 ? '' : i}}</td>
+              <td v-if="i == 0 && n != 0">{{ n | convertChar }}</td>
+              <td @click="fire($event)" :data-opcords="i + '' + n" data-hittable="true" class="tile" v-if="i > 0 && n != cols"></td>
+            </template>
+          </tr>
+        </table>
+    </template>
+</div>
+
+</div>
+<script>
+const logoPage = { template: '\
+<div class="index">\
+	<router-link class="logo-index" to="/loginPage">\
+		<img  src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg" alt="SEA OF BATTLES">\
+	</router-link>\
+</div>' }
+
+const loginPage = { template: '\
+<div>\
+   <form class="modal-content animate" action="ACAO-DE-LOGIN.py" method="post">\
+    <div class="imgcontainer">\
+        <router-link to="/">\
+            <span class="close">&times;</span>\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" alt="SEA OF BATTLES" class="avatar-login">\
+        </router-link>\
+    </div>\
+\
+    <div class="container">\
+      <input type="text" placeholder="u s e r n a m e" name="username" minlength="4" required>\
+\
+      <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+\
+      <button type="submit" class="submit-button">ENTRAR</button>\
+\
+    <router-link to="/signUpPage">\
+        <button type="button"  class="submit-button">CADASTRE-SE</button>\
+    </router-link>\
+    </div>\
+  </form>\
+</div>\
+' }
+
+const signUpPage = { template: '\
+<form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
+    <div class="imgcontainer">\
+      <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg" class="avatar" id="imgClickAndChange" onclick="changeImage()" usemap="#SUB15" />\
+      <strong><p style="color: steelblue">CLIQUE NO AVATAR PARA ALTERAR</p></strong>\
+    </div>\
+    <div class="container">\
+      <input type="email" placeholder="e - m a i l" name="uname" required>\
+\
+      <input type="text" placeholder="u s e r n a m e" name="psw" minlength="4" required>\
+\
+      <input type="text" placeholder="n i c k n a m e" name="uname" minlength="8" required>\
+\
+      <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+\
+      <button type="submit" class="submit-button">CONFIRMAR</button>\
+    </div>\
+  </form>' }
+
+const mainPage = { template: '\
+  <div class="test">\
+	<div class="sidenav"> <br>\
+	  <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
+	  <a href="profile.html">EDITAR PERFIL</a><br><br>\
+	  <a href="store.html">LOJA DE BATALHA</a><br><br>\
+	  <a href="gold.html">COMPRAR OURO</a><br><br>\
+	  <a href="login.html">SAIR DO JOGO</a>\
+	</div>\
+\
+	<div class="btn-group" style="width: 80%; margin-left: 40%">\
+	  <button style="width:25%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	  <button style="width:25%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	</div>\
+\
+	<p> </p> <p> </p> <p> </p> <p> </p> <p> </p> <p> </p>\
+\
+	<div class="btn-group" style="width:100%">\
+	  <button onclick="window.location.href=\'start.html\';" style="width: 40%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/target.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	  <button onclick="window.location.href=\'search.html\';" style="width: 40%; margin-left: 60px">\
+		<img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/search.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+	  </button>\
+	</div>\
+\
+</div>\
+' }
+
+const gameScreen = { template: '' }
+
+// 2. Define some routes
+// Each route should map to a component. The "component" can
+// either be an actual component constructor created via
+// `Vue.extend()`, or just a component options object.
+// We'll talk about nested routes later.
+const routes = [
+  { path: '/', component: logoPage },
+  { path: '/loginPage', component: loginPage },
+  { path: '/signUpPage', component: signUpPage },
+  { path: '/mainPage', component: mainPage },
+  { path: '/gameScreen', component: gameScreen },
+]
+
+// 3. Create the router instance and pass the `routes` option
+// You can pass in additional options here, but let's
+// keep it simple for now.
+const router = new VueRouter({
+  routes // short for `routes: routes`
+})
+
+// 4. Create and mount the root instance.
+// Make sure to inject the router with the router option to make the
+// whole app router-aware.
+const app = new Vue({
+  router
+}).$mount('#app')
+
+
+
+var counter = 1;
+function changeImage(){
+    if(counter == 0){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
+        counter++;
+    }
+    else if(counter == 1){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
+        counter++;
+    }
+    else if(counter == 2){
+        document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
+        counter = 0;
+    }
+};
+</script>
+<style>
+/* ========================= GERAL ======================== */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: ghostwhite;
+}
+
+input[type=text], input[type=email], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 2px solid steelblue;
+  box-sizing: border-box;
+  text-align: center;
+  color: steelblue;
+  background-color: ghostwhite;
+}
+
+logo {
+  margin: 160px 0 12px 0;
+  display: flex;   
+  justify-content: center; 
+}
+
+logo:hover {
+  opacity: 0.8;
+}
+
+button {
+  background-color: steelblue;
+  color: ghostwhite;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-weight:bold
+}
+
+.submit-button:hover {
+  color: steelblue;
+  background-color: lightsteelblue;
+  cursor: pointer;
+}
+
+.imgcontainer {
+  text-align: center;
+  margin: 24px 0 12px 0;
+  position: relative;
+}
+
+img.avatar {
+  width: 20%;
+  border-radius: 50%;
+  border: 2px solid steelblue;
+}
+
+.container {
+  text-align: center;
+  margin: 24px 0 12px 0;
+  padding: 16px;
+}
+
+span.psw {
+  float: right;
+  padding-top: 10px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: ghostwhite;
+  padding-top: 10px;
+}
+
+.modal-content {
+  background-color: ghostwhite;
+  margin: 2% auto 2% auto;
+  border: 2px solid steelblue;
+  width: 50%;
+}
+
+.animate {
+  -webkit-animation: animatezoom 0.6s;
+  animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+  from {-webkit-transform: scale(0)} 
+  to {-webkit-transform: scale(1)}
+}
+  
+@keyframes animatezoom {
+  from {transform: scale(0)} 
+  to {transform: scale(1)}
+}
+
+@media screen and (max-width: 300px) {
+  span.psw {
+     display: block;
+     float: none;
+  }
+}
+.close {
+  position: absolute;
+  right: 40px;
+  top: 0;
+  color: steelblue;
+  font-size: 35px;
+  font-weight: bold;
+}
+.close:hover,
+.close:focus {
+  color: crimson;
+  cursor: pointer;
+  transform: scale(2)
+}
+/* =========================  INDEX  ======================== */
+body.index{
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: ghostwhite;
+  overflow: hidden;
+}
+
+.logo-index {
+  animation: animatezoom 1s;
+  display: block;
+  text-align: center;
+  margin-top: 10%;
+  width: 15%;
+  height: 15%;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.5;
+}
+.logo-index:hover{
+  opacity: 1;
+  cursor: pointer;
+  transform: scale(1.2);
+}
+/* ========================= LOGIN ======================== */
+.modal-content {
+  background-color: ghostwhite;
+  margin: 2% auto 2% auto;
+  border: 2px solid steelblue;
+  width: 50%;
+  animation: animatezoom 2s;
+}
+img.avatar-login {
+  width: 20%;
+}
+/* =========================  PROFILE  ======================== */
+
+input.profile-submit {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 2px solid steelblue;
+  box-sizing: border-box;
+  text-align: center;
+  color: steelblue;
+  background-color: ghostwhite;
+}
+.profile-modal-content {
+  background-color: ghostwhite;
+  margin: 2% auto 2% auto;
+  border: 2px solid steelblue;
+  width: 50%;
+  animation: animatezoom 1.5s;
+}
+img.avatar-profile {
+  width: 25%;
+  border-radius: 50%;
+  border: 2px solid steelblue;
+}
+/* ========================= MAIN  ======================== */
+.test {
+  font-family: "Lato", sans-serif; Arial;
+  background-color: ghostwhite;
+  overflow: hidden;
+  text-align: center;
+  padding: 12px;
+  margin-left: 240px;
+}
+
+.sidenav {
+  height: 100%;
+  width: 240px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: lightsteelblue;
+  overflow: hidden;
+}
+
+.sidenav a {
+  text-decoration: none;
+  color: steelblue;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+}
+
+.sidenav a:hover {
+  color: #4D4D4D;
+  transform: scale(1.5);
+}
+
+.btn-group button {
+  border: 4px solid steelblue;
+  padding: 24px;
+  cursor: pointer;
+  float: left;
+  background-color: ghostwhite;
+}
+
+
+/* ========================= SIGNUP  ======================== */
+img.avatar-signup {
+  width: 20%;
+  border-radius: 50%;
+}
+/* ===========================  STORE  ======================== */
+fieldset {
+  background-color: ghostwhite;
+  border: 2px solid steelblue;
+  color: steelblue;
+  width: 50%;
+  animation: animatezoom 2s;
+  margin: 2% auto 2% auto;
+}
+
+.imgcontainer-store {
+  text-align: center;
+  margin: 0 auto;
+  position: relative;
+}
+
+.container-store {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.container-store input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: lightsteelblue;
+}
+
+.container-store:hover input ~ .checkmark {
+    background-color:steelblue;
+    opacity:0.8;
+}
+
+.container-store input:checked ~ .checkmark {
+  background-color: steelblue;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.container-store input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.container-store .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.input-store[type=text] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 2px solid steelblue;
+  box-sizing: border-box;
+  text-align: center;
+  color: steelblue;
+  background-color: ghostwhite;
+  font-weight:bold;
+}
+
+
+
+
+/* ========================= START ======================== */
+.v-center {
+  min-height:200px;
+  display: flex;
+  justify-content:center;
+  flex-flow: column wrap;
+}
+/* ========================= SEARCH ======================== */
+
+input.search-submit {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 2px solid steelblue;
+  box-sizing: border-box;
+  text-align: center;
+  color: steelblue;
+  background-color: ghostwhite;
+}
+.search-modal-content {
+  background-color: ghostwhite;
+  margin: 2% auto 2% auto;
+  border: 2px solid steelblue;
+  width: 50%;
+  animation: animatezoom 1.5s;
+}
+h3.search-title{
+    color: steelblue;
+    padding-top:12px;
+}
+/* ========================= GOLD ======================== */
+.custom-select {
+  text-align: center;
+  position: relative;
+  font-family: Helvetica, sans-serif;
+}
+
+.custom-select select {
+  display: none;
+}
+
+.select-selected {
+  background-color: lightsteelblue;
+}
+
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid steelblue;
+  border-color: steelblue transparent transparent transparent;
+}
+
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent steelblue transparent;
+  top: 7px;
+}
+
+.select-items div,.select-selected {
+  color: steelblue;
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-items {
+  position: absolute;
+  background-color: lightsteelblue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+.select-hide {
+  display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.modal-content-gold {
+  background-color: ghostwhite;
+  margin: 2% auto 2% auto;
+  border: 2px solid steelblue;
+  width: 50%;
+  animation: animatezoom 2s;
+}
+</style>
