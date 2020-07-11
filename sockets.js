@@ -387,6 +387,24 @@ module.exports.listen = function(http, rooms, users) {
             });
         });
 
+        socket.on('purchase', function(obj){
+            user.findOne({'user':obj.user},function(err, res){
+                const newSkin=[...res.skins, obj.skin];                
+                user.update({'user':obj.user}, {$set:{skins:newSkin}}, function(err, res){
+                    removeCoin(obj.coins);
+                    socket.emit('purchase', {coins:res.coins, skins:res.skins});
+                })
+            })
+        });
+
+        socket.on('addCredit', function(obj){
+            addCoin(obj.user, obj.coins);
+            socket.emit('addCredit',{coins:res.coins});
+        })
+
+        socket.on('cadastro', function(obj){
+            
+        })
     });
     
     return io;
