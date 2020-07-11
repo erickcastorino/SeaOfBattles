@@ -53,6 +53,14 @@
                   </div>
                 </fieldset>
               </form>
+              <form v-on:submit.prevent="login" class="form-horizontal">
+                <fieldset>
+                  <legend>login</legend>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                  </div>
+                </fieldset>
+              </form>
           </div>
 		</div>
         <div class="col-md-4">
@@ -268,7 +276,6 @@
       } 
       else{alert('Você não possui esse tema!!')}
     }
-    alert(vm.room)
   </script>
   <script type="text/javascript" src="/vue/dist/vue.js"></script>
   <script type="text/javascript" src="/js/ship.js"></script>

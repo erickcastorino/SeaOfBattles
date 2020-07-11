@@ -129,6 +129,11 @@ module.exports.listen = function(http, rooms) {
             });
 
         });
+        socket.on('login', function(obj) {
+            console.log('init socket login')
+            socket.emit('login',true)
+            console.log('end socket login')
+        });
 
         socket.on('init', function(roomName) {
 

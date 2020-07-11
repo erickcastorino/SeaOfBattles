@@ -282,15 +282,23 @@ var vm = new Vue({
         canFire: false,
         room: null,
         componentKey: 0,
-        theme: 'viking'
+        theme: 'viking',
+        userId: '',
+        username: 'TestErick',
+        password: 'jmfiejiefji',
+        ownedShips: {'basico':true,'fogo':false,'floresta':false,'':'','':''}
     },
 
     methods: {
         setSelectedShip: function(ship) {
             this.selectedShip = ship;
         },
-        reRender(){
-           this.forceUpdate()
+        login: function(){
+           console.log('init login')
+           socket.emit('login',{'user':this.usename,'password':this.password})
+           socket.on('login',function(user){console.log(user)}) 
+           console.log('end login')
+           return true
         },
         sendMessage: function() {
             var tbox = document.querySelector('#messages');
