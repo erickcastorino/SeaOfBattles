@@ -164,7 +164,6 @@ Vue.component('board', {
 
                 for (var i = 0; i < hoveredTile.length; i++) {
                     var srcImg =  'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ this.$root.theme + '-'+ hoveredTile.length + '/' + (i+1) + '.png'
-                    alert(srcImg)
                     document.querySelector('[data-cords="'+ hoveredTile[i].getAttribute('data-cords')+"_img" +'"]').src =  srcImg
                     if (!this.$root.rotated) {
                         document.querySelector('[data-cords="'+ hoveredTile[i].getAttribute('data-cords')+"_img" +'"]').style =  'transform: rotate(90deg);'
