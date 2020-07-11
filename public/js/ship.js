@@ -124,7 +124,6 @@ Vue.component('board', {
     methods: {
 
         placeShip: function(el) {
-            alert(this.$root.theme)
 
             if(this.$root.selectedShip == null || this.$root.selectedShip.amount == 0)
                 return;
@@ -162,10 +161,10 @@ Vue.component('board', {
 
             if (!overlap) {
                 this.$root.selectedShip.amount--;
-                alert(this.$root.rotated)
 
                 for (var i = 0; i < hoveredTile.length; i++) {
-                    var srcImg =  'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/test2/' + i + '.png'
+                    var srcImg =  'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ this.$root.theme + '-'+ hoveredTile.length + '/' + (i+1) + '.png'
+                    alert(srcImg)
                     document.querySelector('[data-cords="'+ hoveredTile[i].getAttribute('data-cords')+"_img" +'"]').src =  srcImg
                     if (!this.$root.rotated) {
                         document.querySelector('[data-cords="'+ hoveredTile[i].getAttribute('data-cords')+"_img" +'"]').style =  'transform: rotate(90deg);'

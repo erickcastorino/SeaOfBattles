@@ -4,11 +4,11 @@ var uniqid = require('uniqid');
 module.exports.listen = function(http, rooms) {
 
     var ships = [
-        { 'type': 'Aircraft carrier', 'size': 4, 'location': [], 'hits': 0, 'amount': 0},
-        { 'type': 'Battleship', 'size': 3, 'location': [], 'hits': 0, 'amount': 0},
-        { 'type': 'Submarine', 'size': 2, 'location': [], 'hits': 0, 'amount': 3},
-        { 'type': 'Cruiser', 'size': 2, 'location': [], 'hits': 0, 'amount': 0},
-        { 'type': 'Destroyer', 'size': 1, 'location': [], 'hits': 0, 'amount': 0}
+        { 'type': 'Aircraft carrier', 'size': 4, 'location': [], 'hits': 0, 'amount': 1},
+        { 'type': 'Battleship', 'size': 3, 'location': [], 'hits': 0, 'amount': 1},
+        { 'type': 'Submarine', 'size': 2, 'location': [], 'hits': 0, 'amount': 1},
+        { 'type': 'Cruiser', 'size': 2, 'location': [], 'hits': 0, 'amount': 1},
+        { 'type': 'Destroyer', 'size': 1, 'location': [], 'hits': 0, 'amount': 1}
     ];
 
        function shipTiles() {
