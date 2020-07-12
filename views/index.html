@@ -78,16 +78,16 @@
                   class="btn btn-default btn-xs" v-show="ship.amount > 0">Colocar um {{ ship.type }}</button> </p>
           </div>
           <div class="themeSelection">
-            <img id ="themePreview" class="themePreview" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/basico-4/basico 4.png">
+            <img id ="themePreview" class="themePreview" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/basico-3/basico 3.png">
             <div class="dropdownButton">
             <div class="dropdown">
               <button class="dropbtn">Temas</button>
               <div class="dropdown-content">
-                <a onclick="changeThemeTo('basico')">Básico</a>
-                <a onclick="changeThemeTo('viking')">Viking</a>
-                <a onclick="changeThemeTo('floresta')">Floresta</a>
-                <a onclick="changeThemeTo('fogo')">Fogo</a>
-                <a onclick="changeThemeTo('pirata')">Pirata</a>
+                <a onclick="changeThemeTo('basico')">Tema Básico</a>
+                <a onclick="changeThemeTo('viking')">Tema Viking</a>
+                <a onclick="changeThemeTo('floresta')">Tema Florestal</a>
+                <a onclick="changeThemeTo('infernal')">Tema Infernal</a>
+                <a onclick="changeThemeTo('pirata')">Tema Pirata</a>
               </div>
             </div></div>
           </div>
@@ -310,7 +310,7 @@
       playerHasTheme = true
       if (playerHasTheme) {
         vm.theme = themeSelected
-        document.getElementById("themePreview").src = 'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ themeSelected + '-4/'+ themeSelected + '4.png'
+        document.getElementById("themePreview").src = 'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ themeSelected + '-3/'+ themeSelected + '3.png'
       } else {
         alert('Você não possui esse tema!!')
       }
