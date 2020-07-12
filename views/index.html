@@ -1,134 +1,141 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    <title>Battleship</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link href="css/style.css" rel="stylesheet"/>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <link href="css/pages.css" rel="stylesheet"/>
-  </head>
-  <body>
-    <div class="container">
-      <div id="game">
-        <div id = 'app'>
-          <router-view></router-view>
-        </div>
-      <div id='gameScreen'>
-      <h2>Battleship</h2> 
-      <div v-if="room != null && isHost" class="form-group">
-        <label class="control-label" for="share">Share this URL with a friend</label>
-        <input style="width: 250px;" class="form-control input-sm" onClick="this.select();" value="{{room}}" type="text" id="share">
+
+<head>
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <title>Battleship</title>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link href="css/pages.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container">
+    <div id="game">
+      <div id='app'>
+        <router-view></router-view>
       </div>
-      <h4 v-else>You joined a room.</h4><h4 style="display:inline;" v-show="opponentReady && ready && canFire" >Your turn</h4><h4 style="display:inline;"  v-show="opponentReady && ready && !canFire" >Opponent's turn</h4>
-      <div class="row">
-      	<div class="col-md-4">
-          
-      		<h4>Your board <span v-show="!ready">Not ready</span><span v-else>Ready</span></h4>
-        	<board :cols="10" :rows="10" :ship="viking"></board>
-        	 	
+      <div class="gameContainer">
+        <div v-if="room != null && isHost" class="startingGroup">
+          <label class="control-label" for="share">Compartilhe para Jogar com um companheiro</label>
+          <input style="width: 250px;" class="form-control input-sm" onClick="this.select();" value="{{room}}"
+            type="text" id="share">
+          <h4 v-else>Se juntou a uma sala.</h4>
+          <h4 style="display:inline;" v-show="opponentReady && ready && canFire">Your turn</h4>
+          <h4 style="display:inline;" v-show="opponentReady && ready && !canFire">Opponent's turn</h4>
         </div>
-        <div class="col-md-4">
-        <h4>Opponent's board {{statusMessage}}</h4>
-        	<opponent-board :cols="10" :rows="10" ></board>   
-        </div>
-        <div class="col-md-4">
+        <div class="gameBoards">
+          <div class="playerBoard">
+            <h4>Seu Campo está<span v-show="!ready"> com navios pendentes</span><span v-else> pronto</span></h4>
+            <board :cols="10" :rows="10" :ship="viking"></board>
+          </div>
+          <div class="opponentBoard">
+            <h4>Campo do Oponente {{statusMessage}}</h4>
+            <opponent-board :cols="10" :rows="10">
+              </board>
+          </div>
+          <div class="messageChat">
             <div class="well bs-component">
               <form v-on:submit.prevent="sendMessage" class="form-horizontal">
                 <fieldset>
-                  <legend>Chat</legend>
+                  <legend>Conversa com o Inimigo</legend>
                   <div class="form-group">
-                  <div class="col-lg-12">
                     <ul id="messages" style="width:100%;height:200px;">
                     </ul>
-                    </div>
-                    <div class="col-lg-9">
-                      <input type="text" class="form-control chatmessage" placeholder="Message">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    <input type="text" class="form-control chatmessage" placeholder="Mandar Menssagem">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
                   </div>
                 </fieldset>
               </form>
               <form v-on:submit.prevent="login" class="form-horizontal">
                 <fieldset>
-                  <legend>login</legend>
+                  <legend>Logar-se</legend>
                   <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
                   </div>
                 </fieldset>
               </form>
-          </div>
-		</div>
-        <div class="col-md-4">
-        <h3>Your ships <button @click="rotated = !rotated" type="button" class="btn btn-default btn-xs">Rotate ship {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
-        <p v-for="ship in ships">
-        <button @click="setSelectedShip(ship)" :disabled="ship.amount == 0" type="button" class="btn btn-default btn-xs">Select</button> {{ ship.type }} {{ ship.amount}}x</p>
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Temas
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" onclick="changeThemeTo('basico')">Básico</a>
-            <a class="dropdown-item" onclick="changeThemeTo('viking')">Viking</a>
-            <a class="dropdown-item" onclick="changeThemeTo('floresta')">Floresta</a>
-            <a class="dropdown-item" onclick="changeThemeTo('fogo')">Fogo</a>
-            <a class="dropdown-item" onclick="changeThemeTo('pirata')">Pirata</a>
+            </div>
           </div>
         </div>
+        <div v-show="!ready" class="shipPlacement">
+          <div class="shipSelection">
+            <sh>
+              <h3>Navios Pendentes <button @click="rotated = !rotated" type="button"
+                  class="btn btn-default btn-xs">Posicionar navio na
+                  {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
+              <p v-for="ship in ships">
+                <button @click="setSelectedShip(ship)" :disabled="ship.amount == 0" type="button"
+                  class="btn btn-default btn-xs" v-show="ship.amount > 0">Colocar um {{ ship.type }}</button> </p>
+          </div>
+          <div class="themeSelection">
+            <img id ="themePreview" class="themePreview" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/basico-4/basico 4.png">
+            <div class="dropdownButton">
+            <div class="dropdown">
+              <button class="dropbtn">Temas</button>
+              <div class="dropdown-content">
+                <a onclick="changeThemeTo('basico')">Básico</a>
+                <a onclick="changeThemeTo('viking')">Viking</a>
+                <a onclick="changeThemeTo('floresta')">Floresta</a>
+                <a onclick="changeThemeTo('fogo')">Fogo</a>
+                <a onclick="changeThemeTo('pirata')">Pirata</a>
+              </div>
+            </div></div>
+          </div>
         </div>
-      
-      </div>
-      <template id="board-template" >
-      		<table border="1" :key="componentKey">
-	        	<tr v-for="i in rows+1">
+        <template id="board-template">
+          <table border="1" :key="componentKey">
+            <tr v-for="i in rows+1">
               <template v-for="n in cols+1">
                 <td v-if="n == 0">{{ i == 0 ? '' : i}}</td>
                 <td v-if="i == 0 && n != 0">{{ n | convertChar }}</td>
-                <td @click="placeShip($event)"
-                    data-cords="{{i + '' + n}}" 
-                    v-on:mouseleave="setDef($event)" 
-                    v-on:mouseover="changeStyle($event)" 
-                    class="tile" 
-                    v-if="i > 0 && n != cols">
-                      <img 
-                           src="https://i.ya-webdesign.com/images/perfect-circle-png-2.png" 
-                           width="100%" 
-                           height="100%" 
-                           data-cords="{{i + '' + n}}_img"></td>
+                <td @click="placeShip($event)" data-cords="{{i + '' + n}}" v-on:mouseleave="setDef($event)"
+                  v-on:mouseover="changeStyle($event)" class="tile" v-if="i > 0 && n != cols">
+                  <img width="100%" height="100%"
+                    style="display: none;"
+                    data-cords="{{i + '' + n}}_img"></td>
               </template>
-	        	</tr>
-        	</table>
-      </template>
-      <template id="opponent-board-template">
-      		<table border="1">
-	        	<tr v-for="i in rows+1">
+            </tr>
+          </table>
+        </template>
+        <template id="opponent-board-template">
+          <table border="1">
+            <tr v-for="i in rows+1">
               <template v-for="n in cols+1">
                 <td v-if="n == 0">{{ i == 0 ? '' : i}}</td>
                 <td v-if="i == 0 && n != 0">{{ n | convertChar }}</td>
-                <td @click="fire($event)" data-opcords="{{i + '' + n}}" data-hittable="true" class="tile" v-if="i > 0 && n != cols"></td>
-              </template>	        		
-	        	</tr>
-        	</table>
-      </template>
+                <td @click="fire($event)" data-opcords="{{i + '' + n}}" data-hittable="true" class="tile"
+                  v-if="i > 0 && n != cols"></td>
+              </template>
+            </tr>
+          </table>
+        </template>
+      </div>
     </div>
-    </div>
+  </div>
   <script>
-    alert('pagina Nova')
     var logged = false;
-    const logoPage = { template: '\
+    const logoPage = {
+      template: '\
     <div class="index">\
       <router-link class="logo-index" to="/home">\
         <img  src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg" alt="SEA OF BATTLES">\
       </router-link>\
-    </div>' }
-    
-    const loginPage = { template: '\
+    </div>'
+    }
+    const loginPage = {
+      template: '\
     <div>\
-       <form class="modal-content animate" >\
+       <form  v-on:submit.prevent="login" class="modal-content animate" >\
         <div class="imgcontainer">\
             <router-link to="/">\
                 <span class="close">&times;</span>\
@@ -137,21 +144,23 @@
         </div>\
     \
         <div class="container">\
-          <input type="text" placeholder="u s e r n a m e" name="username" minlength="4" required>\
+          <input v-model="this.$root.username" type="text" placeholder="u s e r n a m e" name="username" minlength="4" required>\
     \
-          <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+          <input type="password" placeholder="p a s s w o r d" name="psw" v-model="this.$root.password" minlength="8" required>\
     \
           <button class="submit-button" onclick="login()">ENTRAR</button>\
     \
-        <router-link to="/signUpPage">\
+        \
             <button type="button"  class="submit-button">CADASTRE-SE</button>\
-        </router-link>\
+        \
         </div>\
       </form>\
     </div>\
-    ' }
-    
-    const signUpPage = { template: '\
+    '
+    }
+
+    const signUpPage = {
+      template: '\
     <form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
         <div class="imgcontainer">\
           <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
@@ -169,9 +178,11 @@
     \
           <button type="submit" class="submit-button">CONFIRMAR</button>\
         </div>\
-      </form>' }
-    
-    const mainPage = { template: '\
+      </form>'
+    }
+
+    const mainPage = {
+      template: '\
       <div class="test">\
       <div class="sidenav"> <br>\
         <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
@@ -202,29 +213,49 @@
       </div>\
     \
     </div>\
-    ' }
+    '
+    }
     var shipTheme = 'viking'
-    const gameScreen = { template: '\
-        ' }
-    
+    const gameScreen = {
+      template: '\
+        '
+    }
+
     // 2. Define some routes
     // Each route should map to a component. The "component" can
     // either be an actual component constructor created via
     // `Vue.extend()`, or just a component options object.
     // We'll talk about nested routes later.
-    const routes = [
-      { path: '/init', component: logoPage },
-      { path: '/loginPage', component: loginPage },
-      { path: '/signUpPage', component: signUpPage  },
-      { path: '/mainPage', component: mainPage },
-      { path: '/home', get component() {
-                if (logged) {
-                    return mainPage;
-                } else {
-                    return loginPage;
-                }
-            } },
-      { path: '/FFEE', component: gameScreen },
+    const routes = [{
+        path: '/init',
+        component: logoPage
+      },
+      {
+        path: '/loginPage',
+        component: loginPage
+      },
+      {
+        path: '/signUpPage',
+        component: signUpPage
+      },
+      {
+        path: '/mainPage',
+        component: mainPage
+      },
+      {
+        path: '/home',
+        get component() {
+          if (logged) {
+            return mainPage;
+          } else {
+            return loginPage;
+          }
+        }
+      },
+      {
+        path: '/FFEE',
+        component: gameScreen
+      },
     ]
     // 3. Create the router instance and pass the `routes` option
     // You can pass in additional options here, but let's
@@ -233,7 +264,7 @@
       mode: 'history',
       routes // short for `routes: routes`
     })
-    
+
     // 4. Create and mount the root instance.
     // Make sure to inject the router with the router option to make the
     // whole app router-aware.
@@ -242,45 +273,52 @@
     }).$mount('#app')
     var counter = 1;
     var gameMode = false;
-    function changeImage(){
-        if(counter == 0){
-            document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
-            counter++;
-        }
-        else if(counter == 1){
-            document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
-            counter++;
-        }
-        else if(counter == 2){
-            document.getElementById("imgClickAndChange").src = "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
-            counter = 0;
-        }
+
+    function changeImage() {
+      if (counter == 0) {
+        document.getElementById("imgClickAndChange").src =
+          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
+        counter++;
+      } else if (counter == 1) {
+        document.getElementById("imgClickAndChange").src =
+          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
+        counter++;
+      } else if (counter == 2) {
+        document.getElementById("imgClickAndChange").src =
+          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
+        counter = 0;
+      }
     };
-    function switchMode(){
+
+    function switchMode() {
       gameMode = !gameMode
-      if(gameMode){
-        window.location.href='/';
+      if (gameMode) {
+        window.location.href = '/';
       }
       document.getElementById("gameScreen").style = gameMode ? 'display:block;' : 'display:none;';
       document.getElementById("app").style = gameMode ? 'display:none;' : 'display:block;';
       vm.room = 'http://127.0.0.1:3000/'
-      onclick="login()"
+      onclick = "login()"
     };
-    function login(){
+
+    function login() {
       logged = true
       router.push('/mainPage')
     }
-    function changeThemeTo(themeSelected){
+
+    function changeThemeTo(themeSelected) {
       playerHasTheme = true
-      if(playerHasTheme){
+      if (playerHasTheme) {
         vm.theme = themeSelected
-        shipTheme = themeSelected
-      } 
-      else{alert('Você não possui esse tema!!')}
+        document.getElementById("themePreview").src = 'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ themeSelected + '-4/'+ themeSelected + '4.png'
+      } else {
+        alert('Você não possui esse tema!!')
+      }
     }
   </script>
   <script type="text/javascript" src="/vue/dist/vue.js"></script>
   <script type="text/javascript" src="/js/ship.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 </body>
+
 </html>
