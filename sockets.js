@@ -415,9 +415,7 @@ module.exports.listen = function(http, rooms, users) {
         socket.on('purchase', function(obj){
             users.findOne({'user':obj.user},function(err, res){
                 if(!(res==null ||res==undefined)){
-                    const newSkin=[...res.skins, obj.skin];                
-                const newSkin=[...res.skins, obj.skin];                
-                    const newSkin=[...res.skins, obj.skin];                
+                    const newSkin=[...res.skins, obj.skin];                            
                     users.update({'user':obj.user}, {$set:{skins:newSkin}}, function(err, res){
                         payload= removeCoin(obj.coins);
                         socket.emit('purchase', {coins:res.coins, skins:res.skins, ...payload});
