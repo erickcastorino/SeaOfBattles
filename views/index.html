@@ -24,14 +24,14 @@
       <div id='app'>
         <router-view></router-view>
       </div>
-      <div class="gameContainer" >
-        <div class="gameHeader" v-if="room != null && isHost">
+      <div class="gameContainer">
+        <div class="gameHeader" v-if="room != null && isHost" style=>
           <div class="gameLogo"><img style="height: 200px;"
               src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg"></div>
           <div class="playTogether"><label style="padding-bottom: 20px; margin-right: 5px;" class="control-label"
               for="share">Compartilhe para Jogar com um companheiro</label>
-            <input style="width: 250px;border: 2px solid darkslategray;" class="form-control input-sm" onClick="this.select();" value="{{room}}"
-              type="text" id="share"></div>
+            <input style="width: 250px;border: 2px solid darkslategray;" class="form-control input-sm"
+              onClick="this.select();" value="{{room}}" type="text" id="share"></div>
           <h4 style="display:inline;" v-show="opponentReady && ready && canFire">Your turn</h4>
           <h4 style="display:inline;" v-show="opponentReady && ready && !canFire">Opponent's turn</h4>
         </div>
@@ -126,18 +126,18 @@
     </div>
     <p style="color: lightslategray;text-align: right; font-size: large;">Trabalho de Eng. de Software III</p>
   </div>
-  <script>
-    var logged = false;
-    const logoPage = {
-      template: '\
+</body>
+<script>
+  const logoPage = {
+    template: '\
     <div class="index">\
       <router-link class="logo-index" to="/home">\
         <img  src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg" alt="SEA OF BATTLES">\
       </router-link>\
     </div>'
-    }
-    const loginPage = {
-      template: '\
+  }
+  const loginPage = {
+    template: '\
     <div>\
        <form id="loginForm" class="modal-content animate" >\
         <div class="imgcontainer">\
@@ -161,10 +161,10 @@
       </form>\
     </div>\
     '
-    }
+  }
 
-    const signUpPage = {
-      template: '\
+  const signUpPage = {
+    template: '\
     <form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
         <div class="imgcontainer">\
           <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
@@ -183,10 +183,10 @@
           <button type="submit" class="submit-button">CONFIRMAR</button>\
         </div>\
       </form>'
-    }
+  }
 
-    const mainPage = {
-      template: '\
+  const mainPage = {
+    template: '\
       <div class="test">\
       <div class="sidenav"> <br>\
         <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
@@ -218,136 +218,191 @@
     \
     </div>\
     '
-    }
-    var shipTheme = 'viking'
-    const gameScreen = {
-      template: '\
+  }
+  const gameScreen = {
+    template: '\
         '
+  }
+  const errorPage = {
+    template: '\
+      \<iframe id="Game" src="http://127.0.0.1:3000/" title="description"></iframe>\
+        '
+  }
+
+  // 2. Define some routes
+  // Each route should map to a component. The "component" can
+  // either be an actual component constructor created via
+  // `Vue.extend()`, or just a component options object.
+  // We'll talk about nested routes later.
+  const routes = [{
+      path: '/init',
+      component: logoPage
+    },
+    {
+      path: '/loginPage',
+      component: loginPage
+    },
+    {
+      path: '/signUpPage',
+      component: signUpPage
+    },
+    {
+      path: '/mainPage',
+      component: mainPage
+    },
+    {
+      path: '/home',
+      get component() {
+        if (login()) {
+          return mainPage;
+        } else {
+          return loginPage;
+        }
+      }
+    },
+    {
+      path: '/gameScreen',
+      component: gameScreen
+    },
+  ]
+  // 3. Create the router instance and pass the `routes` option
+  // You can pass in additional options here, but let's
+  // keep it simple for now.
+  const router = new VueRouter({
+    mode: 'history',
+    data: {
+      nickname: '',
+      coins: 0
+    },
+    routes, // short for `routes: routes`
+    watch: {
+      "vm.coins": function (newValue, oldValue) {
+        this.coins = vm.coins;
+      }
     }
+  })
 
-    // 2. Define some routes
-    // Each route should map to a component. The "component" can
-    // either be an actual component constructor created via
-    // `Vue.extend()`, or just a component options object.
-    // We'll talk about nested routes later.
-    const routes = [{
-        path: '/init',
-        component: logoPage
-      },
-      {
-        path: '/loginPage',
-        component: loginPage
-      },
-      {
-        path: '/signUpPage',
-        component: signUpPage
-      },
-      {
-        path: '/mainPage',
-        component: mainPage
-      },
-      {
-        path: '/home',
-        get component() {
-          if (logged) {
-            return mainPage;
-          } else {
-            return loginPage;
-          }
-        }
-      },
-      {
-        path: '/FFEE',
-        component: gameScreen
-      },
-    ]
-    // 3. Create the router instance and pass the `routes` option
-    // You can pass in additional options here, but let's
-    // keep it simple for now.
-    const router = new VueRouter({
-      mode: 'history',
-      data: {
-        nickname: '',
-        coins: 0
-      },
-      routes, // short for `routes: routes`
-      watch: {
-          "vm.coins": function (newValue, oldValue) {
-              this.coins = vm.coins;
-          }
-        }
-    })
+  // 4. Create and mount the root instance.
+  // Make sure to inject the router with the router option to make the
+  // whole app router-aware.
+  const app = new Vue({
+    router
+  }).$mount('#app')
+  var counter = 1;
+  var gameMode = false;
 
-    // 4. Create and mount the root instance.
-    // Make sure to inject the router with the router option to make the
-    // whole app router-aware.
-    const app = new Vue({
-      router
-    }).$mount('#app')
-    var counter = 1;
-    var gameMode = false;
+  function changeImage() {
+    if (counter == 0) {
+      document.getElementById("imgClickAndChange").src =
+        "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
+      counter++;
+    } else if (counter == 1) {
+      document.getElementById("imgClickAndChange").src =
+        "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
+      counter++;
+    } else if (counter == 2) {
+      document.getElementById("imgClickAndChange").src =
+        "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
+      counter = 0;
+    }
+  };
 
-    function changeImage() {
-      if (counter == 0) {
-        document.getElementById("imgClickAndChange").src =
-          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg";
-        counter++;
-      } else if (counter == 1) {
-        document.getElementById("imgClickAndChange").src =
-          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/pirate.svg";
-        counter++;
-      } else if (counter == 2) {
-        document.getElementById("imgClickAndChange").src =
-          "https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/viking.svg";
-        counter = 0;
-      }
-    };
+  function switchMode() {
+    gameMode = !gameMode
+    if (gameMode) {
+      window.location.href = '/';
+    }
+    document.getElementById("gameScreen").style = gameMode ? 'display:block;' : 'display:none;';
+    document.getElementById("app").style = gameMode ? 'display:none;' : 'display:block;';
+    vm.room = 'http://127.0.0.1:3000/'
+    onclick = "login()"
+  };
 
-    function switchMode() {
-      gameMode = !gameMode
-      if (gameMode) {
-        window.location.href = '/';
-      }
-      document.getElementById("gameScreen").style = gameMode ? 'display:block;' : 'display:none;';
-      document.getElementById("app").style = gameMode ? 'display:none;' : 'display:block;';
-      vm.room = 'http://127.0.0.1:3000/'
-      onclick = "login()"
-    };
-
-    function login() {
-      logged = true
+  function login() {
       var socket = io();
-      console.log('init login')
-      console.log({'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
-      socket.emit('login',{'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
-      socket.on('login',function(user){
-        console.log(user)
-        vm.user = user.user
-        vm.nickname = user.nickname
-        vm.password = document.getElementById('loginPassword')
-        vm.email = user.email
-        console.log(user)
-        for (var key in vm.ownedShips) {
-          vm.ownedShips[key] = user.skin.includes(key)
+      socket.emit('login',{user:document.getElementById('loginUsername').value,password:document.getElementById('loginPassword').value})
+      socket.on('login',function(obj){
+        if(obj.error==true){
+          alert(obj.message)
+          return false
+        }else{
+          vm.user = obj.user
+          vm.nickname = obj.nickname
+          vm.email = obj.email
+          vm.coins = obj.coins
+          for (var key in vm.ownedShips) {
+            vm.ownedShips[key] = obj.skin.includes(key)
+          }
+          return true
         }
-    }) 
-      router.push('/mainPage')
+      }) 
+      route = vm.user?'/mainPage':'/loginPage'
+      router.push(route)
     }
-    function changeThemeTo(themeSelected) {
-      playerHasTheme = true
-      if (playerHasTheme) {
-        vm.theme = themeSelected
-        document.getElementById("themePreview").src =
-          'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/' + themeSelected + '-3/' +
-          themeSelected + '3.png'
+
+  function changeThemeTo(themeSelected) {
+    var socket = io();
+    playerHasTheme = true
+    if (playerHasTheme) {
+      vm.theme = themeSelected
+      document.getElementById("themePreview").src =
+        'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/' + themeSelected + '-3/' +
+        themeSelected + '3.png'
+    } else {
+      alert('Você não possui esse tema!!')
+    }
+  }
+
+  function changeIframePage(url) {
+    document.getElementById("Game").src = url
+  }
+
+  function signUp() {
+    var socket = io();
+    socket.emit('signIn', {
+      user: document.getElementById('signInUsername').value,
+      password: document.getElementById('signInPassword').value,
+      email: document.getElementById('signInEmail').value,
+      nickname: document.getElementById('signInNickname').value
+    })
+    socket.on('signIn', function (res) {
+      if (status == 'erro') {
+        alert('Erro: '.concat(msg))
       } else {
-        alert('Você não possui esse tema!!')
+        alert(msg)
       }
-    }
-  </script>
-  <script type="text/javascript" src="/vue/dist/vue.js"></script>
-  <script type="text/javascript" src="/js/ship.js"></script>
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    })
+  }
+  function hostGame(){
+    var socket = io()
+    updateEnergy();
+    socket.emit('init',vm.username)
+    
+  }
+  function joinGame(hostname){
+    updateEnergy();
+    socket.emit('init',hostname)
+    
+  }
+
+
+  function updateEnergy() {
+    var socket = io();
+    socket.emit('updateEnergy',{user: vm.username})
+    socket.on('updateEnergy', function (res) {
+      vm.coinsEnabled = res.coinsEnabled
+      if(res.coinsEnabled){
+        vm.energy = res.energy
+      }
+      else{
+        alert('Você não ganhará nenhuma moeda nesta batalha')
+      }
+    })
+  }
+</script>
+<script type="text/javascript" src="/vue/dist/vue.js"></script>
+<script type="text/javascript" src="/js/ship.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 </body>
 
 </html>
