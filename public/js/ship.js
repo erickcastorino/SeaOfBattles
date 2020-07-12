@@ -66,7 +66,7 @@ socket.on('playerJoined', function() {
 });
 
 socket.on('opponentLeft', function () {
-    vm.statusMessage = 'Opponent left';
+    vm.statusMessage = 'O oponente saiu da sala';
 });
 
 socket.on('opponentReady', function() {
@@ -284,8 +284,12 @@ var vm = new Vue({
         userId: '',
         username: 'Player1',
         password: '12345',
-        ownedShips: {'basico':true,'fogo':false,'floresta':false,'':'','':''},
-        coins: 0
+        ownedShips: {'floresta' :false,
+                     'viking'   :false,
+                     'pirata'	:false,
+                     'infernal' :false},
+        coins: 0,
+        nickname:''
     },
 
     methods: {

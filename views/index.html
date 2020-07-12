@@ -24,7 +24,7 @@
       <div id='app'>
         <router-view></router-view>
       </div>
-      <div class="gameContainer">
+      <div class="gameContainer" >
         <div class="gameHeader" v-if="room != null && isHost">
           <div class="gameLogo"><img style="height: 200px;"
               src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg"></div>
@@ -139,7 +139,7 @@
     const loginPage = {
       template: '\
     <div>\
-       <form  v-on:submit.prevent="login" class="modal-content animate" >\
+       <form id="loginForm" class="modal-content animate" >\
         <div class="imgcontainer">\
             <router-link to="/">\
                 <span class="close">&times;</span>\
@@ -148,11 +148,11 @@
         </div>\
     \
         <div class="container">\
-          <input v-model="this.$root.username" type="text" placeholder="u s e r n a m e" name="username" minlength="4" required>\
+          <input type="text" id="loginUsername" placeholder="u s e r n a m e" name="username" minlength="4" required>\
     \
-          <input type="password" placeholder="p a s s w o r d" name="psw" v-model="this.$root.password" minlength="8" required>\
+          <input type="password" id="loginPassword" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
     \
-          <button class="submit-button" onclick="login()">ENTRAR</button>\
+          <button type="button" onclick="login()" >ENTRAR</button>\
     \
         \
             <button type="button"  class="submit-button">CADASTRE-SE</button>\
@@ -266,7 +266,16 @@
     // keep it simple for now.
     const router = new VueRouter({
       mode: 'history',
-      routes // short for `routes: routes`
+      data: {
+        nickname: '',
+        coins: 0
+      },
+      routes, // short for `routes: routes`
+      watch: {
+          "vm.coins": function (newValue, oldValue) {
+              this.coins = vm.coins;
+          }
+        }
     })
 
     // 4. Create and mount the root instance.
@@ -307,9 +316,23 @@
 
     function login() {
       logged = true
+      var socket = io();
+      console.log('init login')
+      console.log({'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
+      socket.emit('login',{'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
+      socket.on('login',function(user){
+        console.log(user)
+        vm.user = user.user
+        vm.nickname = user.nickname
+        vm.password = document.getElementById('loginPassword')
+        vm.email = user.email
+        console.log(user)
+        for (var key in vm.ownedShips) {
+          vm.ownedShips[key] = user.skin.includes(key)
+        }
+    }) 
       router.push('/mainPage')
     }
-
     function changeThemeTo(themeSelected) {
       playerHasTheme = true
       if (playerHasTheme) {
