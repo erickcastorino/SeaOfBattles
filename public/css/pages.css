@@ -457,7 +457,7 @@ h3.search-title {
 }
 /*===================DropDown=======================*/
 .dropbtn {
-  background-color: #4CAF50;
+  background-color: darkslategray;
   color: white;
   padding: 16px;
   font-size: 16px;
@@ -487,44 +487,84 @@ h3.search-title {
 
 .dropdown-content a:hover {background-color: #ddd;}
 
-.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content {display: block; left: 100%; bottom: 100%;}
 
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
+.dropdown:hover .dropbtn {background-color:rgb(63, 105, 105);}
 
 /* ==================Game Screen====================*/
 .gameContainer {
    display: flex;
    flex-direction: column;
-   background-color: darkgoldenrod;
+}
+.gameHeader{
+  display: flex;
+}
+.gameLogo{
+  flex:1;
+  padding-bottom: 20px;
+}
+.playTogether{
+  flex:3;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.gameHeader{
+  display: flex;
+}
+.blackScreen{
+  border-radius: 15px 50px;
+  background-color: black;
 }
 .gameBoards{
   display: flex;
-  background-color: crimson;  
   color: white;
   border-color: white;
+  margin-top: 7px;
+  margin-left: 7px;
+  margin-right: 7px;
+  padding: 30px;
+  padding-left: 50px;
+  padding-bottom: 10px;
 }
-.startingGroup{
-  background-color: blueviolet;
+.gameGrids{
+  flex: 3;
+  display: flex;  
+  justify-content: center;
+  padding: 10px;
 }
 .playerBoard{
-  background-color: brown;
+  padding: 5px;
+  flex: 1;
 }
 .opponentBoard{
-  background-color: cadetblue;
+  padding: 5px;
+  flex: 1;
 }
 .messageChat{
   flex: 1;
-  background-color: chartreuse;
+  flex: auto;
 }
 .shipPlacement{
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: chocolate;
+  padding: 10px;
 }
 .shipSelection{
   flex: 1;
-  background-color: darkgreen;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+.btnshipSelection{
+  background-color: darkslategray;
+  width: 175px;
+}
+.shipSelectionSecondRow{
+  display: flex;
+  justify-content: space-evenly;
+  background-color: transparent;
 }
 .themeSelection{
   flex: 1;
@@ -532,22 +572,20 @@ h3.search-title {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: darkmagenta;
 }
 .themePreview{
   flex: 1;
+  border: 2px solid darkslategray;
   width: 25%;
-  background-color: darkturquoise;
 }
 .dropdownButton{
   flex: 1;
-  background-color: deeppink;
 }
 /*=======================Tile/table======================*/
 
 td {
-  width: 30px;
-  height: 30px;
+  width: 45px;
+  height: 45px;
   -webkit-box-sizing: border-box;
 }
 
@@ -588,13 +626,14 @@ table td {
   padding: 0;
   overflow-y: scroll;
   margin-bottom: 10px;
+  background-color: black;
 }
-
 #messages li {
   padding: 5px 10px;
   word-wrap: break-word;
+  background-color: black;
 }
 
 #messages li:nth-child(odd) {
-  background: white;
+  background: black;
 }

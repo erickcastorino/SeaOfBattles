@@ -25,71 +25,76 @@
         <router-view></router-view>
       </div>
       <div class="gameContainer">
-        <div v-if="room != null && isHost" class="startingGroup">
-          <label class="control-label" for="share">Compartilhe para Jogar com um companheiro</label>
-          <input style="width: 250px;" class="form-control input-sm" onClick="this.select();" value="{{room}}"
-            type="text" id="share">
-          <h4 v-else>Se juntou a uma sala.</h4>
+        <div class="gameHeader" v-if="room != null && isHost">
+          <div class="gameLogo"><img style="height: 200px;"
+              src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg"></div>
+          <div class="playTogether"><label style="padding-bottom: 20px; margin-right: 5px;" class="control-label"
+              for="share">Compartilhe para Jogar com um companheiro</label>
+            <input style="width: 250px;border: 2px solid darkslategray;" class="form-control input-sm" onClick="this.select();" value="{{room}}"
+              type="text" id="share"></div>
           <h4 style="display:inline;" v-show="opponentReady && ready && canFire">Your turn</h4>
           <h4 style="display:inline;" v-show="opponentReady && ready && !canFire">Opponent's turn</h4>
         </div>
-        <div class="gameBoards">
-          <div class="playerBoard">
-            <h4>Seu Campo está<span v-show="!ready"> com navios pendentes</span><span v-else> pronto</span></h4>
-            <board :cols="10" :rows="10" :ship="viking"></board>
-          </div>
-          <div class="opponentBoard">
-            <h4>Campo do Oponente {{statusMessage}}</h4>
-            <opponent-board :cols="10" :rows="10">
-              </board>
-          </div>
-          <div class="messageChat">
-            <div class="well bs-component">
-              <form v-on:submit.prevent="sendMessage" class="form-horizontal">
-                <fieldset>
-                  <legend>Conversa com o Inimigo</legend>
-                  <div class="form-group">
-                    <ul id="messages" style="width:100%;height:200px;">
-                    </ul>
-                    <input type="text" class="form-control chatmessage" placeholder="Mandar Menssagem">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                  </div>
-                </fieldset>
-              </form>
-              <form v-on:submit.prevent="login" class="form-horizontal">
-                <fieldset>
-                  <legend>Logar-se</legend>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                  </div>
-                </fieldset>
-              </form>
+        <div class="blackScreen">
+          <div class="gameBoards">
+            <div class="gameGrids">
+              <div class="playerBoard">
+                <h4>Seu Campo está<span v-show="!ready"> com navios pendentes</span><span v-else> pronto</span></h4>
+                <board :cols="10" :rows="10" :ship="viking"></board>
+              </div>
+              <div class="opponentBoard">
+                <h4>Campo do Oponente({{statusMessage}})</h4>
+                <opponent-board :cols="10" :rows="10">
+                  </board>
+              </div>
+            </div>
+            <div class="messageChat">
+              <div class="well bs-component">
+                <form v-on:submit.prevent="sendMessage" class="form-horizontal">
+                  <fieldset style="background-color:black;border: 2px solid darkslategray;">
+                    <legend style="color:white;">Conversa com o Inimigo</legend>
+                    <div class="form-group">
+                      <ul id="messages" style="width:100%;height:400px; color:darkslategray; ">
+                      </ul>
+                      <input type="text" class="form-control chatmessage"
+                        style="background-color: black;border: 2px solid darkslategray;" placeholder="Mandar Menssagem">
+                      <button type="submit" class="btn btn-primary"
+                        style="background-color: darkslategray;">Enviar</button>
+                    </div>
+                  </fieldset>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-show="!ready" class="shipPlacement">
-          <div class="shipSelection">
-            <sh>
-              <h3>Navios Pendentes <button @click="rotated = !rotated" type="button"
-                  class="btn btn-default btn-xs">Posicionar navio na
-                  {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
-              <p v-for="ship in ships">
-                <button @click="setSelectedShip(ship)" :disabled="ship.amount == 0" type="button"
-                  class="btn btn-default btn-xs" v-show="ship.amount > 0">Colocar um {{ ship.type }}</button> </p>
-          </div>
-          <div class="themeSelection">
-            <img id ="themePreview" class="themePreview" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/basico-3/basico 3.png">
-            <div class="dropdownButton">
-            <div class="dropdown">
-              <button class="dropbtn">Temas</button>
-              <div class="dropdown-content">
-                <a onclick="changeThemeTo('basico')">Tema Básico</a>
-                <a onclick="changeThemeTo('viking')">Tema Viking</a>
-                <a onclick="changeThemeTo('floresta')">Tema Florestal</a>
-                <a onclick="changeThemeTo('infernal')">Tema Infernal</a>
-                <a onclick="changeThemeTo('pirata')">Tema Pirata</a>
+          <div v-show="!ready" class="shipPlacement">
+            <div class="shipSelection">
+              <div class="shipSelectionFirstRow">
+                <h3>Navios Pendentes <button class="btnshipSelection" @click="rotated = !rotated" type="button">Rodar
+                    navio para a
+                    {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
               </div>
-            </div></div>
+              <div class="shipSelectionSecondRow">
+                <div v-for="ship in ships">
+                  <button class="btnshipSelection" @click="setSelectedShip(ship)" :disabled="ship.amount == 0"
+                    type="button" v-show="ship.amount > 0">Colocar um {{ ship.type }}</button> </div>
+              </div>
+            </div>
+            <div class="themeSelection">
+              <img id="themePreview" class="themePreview"
+                src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/basico-3/basico3.png">
+              <div class="dropdownButton">
+                <div class="dropdown">
+                  <button class="dropbtn">Temas</button>
+                  <div class="dropdown-content">
+                    <a onclick="changeThemeTo('basico')">Tema Básico</a>
+                    <a onclick="changeThemeTo('viking')">Tema Viking</a>
+                    <a onclick="changeThemeTo('floresta')">Tema Florestal</a>
+                    <a onclick="changeThemeTo('infernal')">Tema Infernal</a>
+                    <a onclick="changeThemeTo('pirata')">Tema Pirata</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <template id="board-template">
@@ -100,9 +105,7 @@
                 <td v-if="i == 0 && n != 0">{{ n | convertChar }}</td>
                 <td @click="placeShip($event)" data-cords="{{i + '' + n}}" v-on:mouseleave="setDef($event)"
                   v-on:mouseover="changeStyle($event)" class="tile" v-if="i > 0 && n != cols">
-                  <img width="100%" height="100%"
-                    style="display: none;"
-                    data-cords="{{i + '' + n}}_img"></td>
+                  <img width="45px" height="45px" style="display: none;" data-cords="{{i + '' + n}}_img"></td>
               </template>
             </tr>
           </table>
@@ -121,6 +124,7 @@
         </template>
       </div>
     </div>
+    <p style="color: lightslategray;text-align: right; font-size: large;">Trabalho de Eng. de Software III</p>
   </div>
   <script>
     var logged = false;
@@ -310,7 +314,9 @@
       playerHasTheme = true
       if (playerHasTheme) {
         vm.theme = themeSelected
-        document.getElementById("themePreview").src = 'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/'+ themeSelected + '-3/'+ themeSelected + '3.png'
+        document.getElementById("themePreview").src =
+          'https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/' + themeSelected + '-3/' +
+          themeSelected + '3.png'
       } else {
         alert('Você não possui esse tema!!')
       }

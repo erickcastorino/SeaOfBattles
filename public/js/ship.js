@@ -11,14 +11,14 @@ socket.on('init', function(obj) {
     vm.room = window.location + obj.room;
     vm.playerState = obj;
     if (obj.players.length == 2)
-        vm.statusMessage = 'Not ready';
+        vm.statusMessage = 'Navios Pendentes';
 
     console.log(obj.players);
     obj.players.forEach(function(e, i) {
         if (e.id != obj.id)
             if (e.ready) {
                 vm.opponentReady = true;
-                vm.statusMessage = 'Ready';
+                vm.statusMessage = 'Pronto';
             }
     });
 });
@@ -62,7 +62,7 @@ socket.on('canFire', function(obj) {
 });
 
 socket.on('playerJoined', function() {
-    vm.statusMessage = 'Not ready';
+    vm.statusMessage = 'Está com navios pendentes';
 });
 
 socket.on('opponentLeft', function () {
@@ -71,18 +71,18 @@ socket.on('opponentLeft', function () {
 
 socket.on('opponentReady', function() {
     vm.opponentReady = true;
-    vm.statusMessage = 'Ready';
+    vm.statusMessage = 'Pronto';
     console.log('opponent is ready');
 });
 
 socket.on('win', function() {
-    alert('you win');
+    alert('Você venceu!!!!');
 });
 
 socket.on('takeFire', function(obj) {
 
     if (obj.opponent.takenHits == obj.opponent.locations.length) {
-        alert('YOU LOSE!');
+        alert('VOCÊ PERDEU!');
     }
 
     var tile = document.querySelector('[data-cords="'+ obj.cords +'"]');
@@ -92,7 +92,7 @@ socket.on('takeFire', function(obj) {
         vm.statusMessage = 'Opponent turn';
     } else {
         tile.style.backgroundColor = "cornflowerblue";
-        vm.statusMessage = 'Your turn';
+        vm.statusMessage = 'É a sua Vez';
     }
 });
 
@@ -102,7 +102,7 @@ socket.on('hit', function(obj) {
 
     if (obj.hit) {
         document.querySelector('[data-opcords="'+ obj.cords +'"]').style.backgroundColor = "red";
-        vm.statusMessage = 'Your turn';
+        vm.statusMessage = 'É a sua Vez';
         vm.canFire = true;
     } else {
         document.querySelector('[data-opcords="'+ obj.cords +'"]').style.backgroundColor = "cornflowerblue";
@@ -272,7 +272,7 @@ var vm = new Vue({
     data: {
         ships: [],  
         selectedShip: null,
-        statusMessage: 'Waiting for opponent',
+        statusMessage: 'Esperando oponente',
         rotated: false, //vertical
         opponentReady: false,
         ready: false,
