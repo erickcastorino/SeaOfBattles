@@ -318,7 +318,6 @@
       var socket = io();
       socket.emit('login',{user:document.getElementById('loginUsername').value,password:document.getElementById('loginPassword').value})
       socket.on('login',function(obj){
-        console.log(obj.error,'/asd/',obj.message)
         if(obj.error==true){
           alert(obj.message)
         }else{

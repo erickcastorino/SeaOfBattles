@@ -438,7 +438,7 @@ module.exports.listen = function(http, rooms, users) {
                 if (res.energy<=0){
                     socket.emit('updateEnergy', {can: false, energy :0});
                 }else{
-                    users.update({'user': obj.user}, {$set: {energy: obj.energy}}, function(err, res) {
+                    users.update({'user': obj.user}, {$set: {energy: res.energy-1}}, function(err, res) {
                         socket.emit('updateEnergy', {can: true, energy: 0});
                     })
                 }
