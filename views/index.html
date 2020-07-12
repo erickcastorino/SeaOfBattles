@@ -315,23 +315,23 @@
     };
 
     function login() {
+      logged = true
       var socket = io();
-      socket.emit('login',{user:document.getElementById('loginUsername').value,password:document.getElementById('loginPassword').value})
-      socket.on('login',function(obj){
-        console.log(obj.error,'/asd/',obj.message)
-        if(obj.error==true){
-          alert(obj.message)
-        }else{
-          vm.user = obj.user
-          vm.nickname = obj.nickname
-          vm.email = obj.email
-          for (var key in vm.ownedShips) {
-            vm.ownedShips[key] = obj.skin.includes(key)
-          }
+      console.log('init login')
+      console.log({'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
+      socket.emit('login',{'user':document.getElementById('loginUsername').value,'password':document.getElementById('loginPassword').value})
+      socket.on('login',function(user){
+        console.log(user)
+        vm.user = user.user
+        vm.nickname = user.nickname
+        vm.password = document.getElementById('loginPassword')
+        vm.email = user.email
+        console.log(user)
+        for (var key in vm.ownedShips) {
+          vm.ownedShips[key] = user.skin.includes(key)
         }
-      }) 
-      route = vm.user?'/mainPage':'/loginPage'
-      router.push(route)
+    }) 
+      router.push('/mainPage')
     }
     function changeThemeTo(themeSelected) {
       playerHasTheme = true

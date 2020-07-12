@@ -5,6 +5,8 @@ socket.emit('init', window.location.pathname.substring(1, window.location.pathna
 
 socket.on('init', function(obj) {
 
+    //console.log(obj.players.length);
+    console.log(obj.players);
     vm.ships = obj.ships;
     vm.room = window.location + obj.room;
     vm.playerState = obj;
@@ -280,7 +282,8 @@ var vm = new Vue({
         componentKey: 0,
         theme: 'basico',
         userId: '',
-        username: '',
+        username: 'Player1',
+        password: '12345',
         ownedShips: {'floresta' :false,
                      'viking'   :false,
                      'pirata'	:false,
