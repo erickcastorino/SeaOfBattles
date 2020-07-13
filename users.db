@@ -47,3 +47,6 @@
 {"user":"Player2","password":"12345","nickname":"P2","coins":3500,"email":"p2@gmail.com","skins":["florestal","inferno"],"energy":10,"_id":"1CxBuEcvUSEoiZ2c"}
 {"user":"Player1","password":"12345","nickname":"P1","coins":1000,"email":"p1@gmail.com","skins":[],"energy":10,"_id":"CAVElHDaPt2xDVdj"}
 {"user":"Player2","password":"12345","nickname":"P2","coins":"3500500","email":"p2@gmail.com","skins":["florestal","inferno"],"energy":8,"_id":"0NYHDK3FBPOCgxAK"}
+{"user":"Player2","password":"12345","nickname":"P2","coins":"3500500","email":"p2@gmail.com","skins":["florestal","inferno"],"energy":7,"_id":"0NYHDK3FBPOCgxAK"}
+{"user":"Player2","password":"12345","nickname":"P2","coins":"3500500","email":"p2@gmail.com","skins":["florestal","inferno"],"energy":6,"_id":"0NYHDK3FBPOCgxAK"}
+{"user":"Player2","password":"12345","nickname":"P2","coins":"3500500","email":"p2@gmail.com","skins":["florestal","inferno"],"energy":5,"_id":"0NYHDK3FBPOCgxAK"}
