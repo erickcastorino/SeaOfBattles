@@ -132,6 +132,19 @@ span.psw {
   cursor: pointer;
   transform: scale(2)
 }
+
+
+.closeAlt {
+  color: steelblue;
+  font-size: 35px;
+  font-weight: bold;
+}
+.closeAlt:hover,
+.closeAlt:focus {
+  color: crimson;
+  cursor: pointer;
+  transform: scale(2)
+}
 /* =========================  INDEX  ======================== */
 body.index{
   font-family: Arial, Helvetica, sans-serif;

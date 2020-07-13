@@ -65,6 +65,7 @@
                 </form>
               </div>
             </div>
+              <span class="closeAlt" onclick="router.push('/mainPage'); switchMode()">&times;</span>
           </div>
           <div v-show="!ready" class="shipPlacement">
             <div class="shipSelection">
@@ -400,6 +401,10 @@
       component: mainPage
     },
     {
+      path: '*',
+      component: logoPage
+    },
+    {
       path: '/home',
       get component() {
         if (logged) {
@@ -410,11 +415,7 @@
       }
     },
     {
-      path: '/joinGame',
-      component: join
-    },
-    {
-      path: '/gameScreen',
+      path: '/',
       component: gameScreen
     },
   ]
