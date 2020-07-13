@@ -142,7 +142,7 @@
     <div>\
        <form id="loginForm" class="modal-content animate" >\
         <div class="imgcontainer">\
-            <router-link to="/">\
+            <router-link to="/init">\
                 <span class="close">&times;</span>\
                 <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" alt="SEA OF BATTLES" class="avatar-login">\
             </router-link>\
@@ -398,7 +398,13 @@
     },
     {
       path: '/mainPage',
-      component: mainPage
+      get component() {
+        if (logged) {
+          return mainPage;
+        } else {
+          return loginPage;
+        }
+      }
     },
     {
       path: '*',
