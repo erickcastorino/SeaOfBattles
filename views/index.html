@@ -359,7 +359,7 @@
         <h3 class="search-title">BUSCAR PARTIDA</h3>\
       </strong>\
 \
-      <span onclick="window.location.href=\'main.html\'" \
+      <span onclick="router.push(\'/mainPage\')" \
       class="close">&times;</span>\
     </div>\
 <br>\
@@ -402,7 +402,7 @@
     {
       path: '/home',
       get component() {
-        if (true) {
+        if (logged) {
           return mainPage;
         } else {
           return loginPage;
@@ -488,6 +488,7 @@
         }
         router.push('/mainPage')
         alert('/mainPage')
+        logged = true
       }
     })
   }
@@ -627,7 +628,7 @@
   function buyGold() {
     console.log(document.getElementById('amount').value)
     socket.emit('addCredit', {
-      'user': vm.user,
+      'user': vm.username,
       'coins': document.getElementById('amount').value
     }) //perguntar fabio sobre como mandar coins
     socket.on('addCredit', function (res) { //perguntar também sobre payload

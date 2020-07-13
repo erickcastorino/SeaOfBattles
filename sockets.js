@@ -145,7 +145,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
     });
 
     var addCoin = function(user, val) {
-        users.findOne({"user":user},function(err, res){
+        users.findOne({"user":user},function(err, res)
+        {console.log({"user":user})
             if(!(res==null ||res==undefined)){
                 users.update({"user":res.user}, {$set:{coins:res.coins+val}},function(err, res){
                     console.log('New coin:', res.coins);            
@@ -440,8 +441,9 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         });
 
         socket.on('addCredit', function(obj){
+            console.log(obj)
             payload = addCoin(obj.user, obj.coins);
-            socket.emit('addCredit',{coins:res.coins,...payload});
+            socket.emit('addCredit',{coins:obj.coins,...payload});
         });
 
         socket.on('updateEnergy', function(obj) {
