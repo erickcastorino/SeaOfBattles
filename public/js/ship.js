@@ -5,8 +5,6 @@ socket.emit('init', window.location.pathname.substring(1, window.location.pathna
 
 socket.on('init', function(obj) {
 
-    //console.log(obj.players.length);
-    console.log(obj.players);
     vm.ships = obj.ships;
     vm.room = window.location + obj.room;
     vm.playerState = obj;
@@ -76,12 +74,18 @@ socket.on('opponentReady', function() {
 });
 
 socket.on('win', function() {
-    alert('Você venceu!!!!');
+    if(vm.coinsEnabled){
+        socket.emit('addCredit',{user:vm.user,coins:50});
+        socket.on('addCredit',function(obj){vm.coins=obj.coins})
+        alert('Você venceu!!!!');
+    }
 });
 
 socket.on('takeFire', function(obj) {
 
     if (obj.opponent.takenHits == obj.opponent.locations.length) {
+        socket.emit('addCredit',{user:vm.user,coins:20});
+        socket.on('addCredit',function(obj){vm.coins=obj.coins})
         alert('VOCÊ PERDEU!');
     }
 
@@ -282,8 +286,7 @@ var vm = new Vue({
         componentKey: 0,
         theme: 'basico',
         userId: '',
-        username: 'Player1',
-        password: '12345',
+        username: '',
         ownedShips: {'floresta' :false,
                      'viking'   :false,
                      'pirata'	:false,

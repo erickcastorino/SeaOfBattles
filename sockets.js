@@ -2,10 +2,20 @@ var socketio = require('socket.io');
 var uniqid = require('uniqid');
 
 
-module.exports.listen = function(http, rooms, users) {
-    users.findOne({"user":'Player1'},function(err, res){
-        console.log('Não teste')
-    })
+module.exports.listen = function(http, rooms, users, listOfRooms) {
+    listOfRooms.insert({listOfRooms:'listOfRooms',list:[]})
+    var updateRoomsList= function(roomName){
+        listOfRooms.findOne({'listOfRooms':'listOfRooms'},function(err,res){
+            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:[...res.list,roomName]}})
+        })
+    }
+    var setInProgress=function(roomName){
+        listOfRooms.findOne({'listOfRooms':'listOfRooms'},function(err,res){
+            room=res.list.find(room=>room.roomName===roomName)
+            room.inProgress=true
+            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:[...res.list,room]}})
+        })
+    }
     var ships = [
         { 'type': 'Porta-Aviões', 'size': 4, 'location': [], 'hits': 0, 'amount': 1},
         { 'type': 'Couraçado', 'size': 3, 'location': [], 'hits': 0, 'amount': 1},
@@ -121,11 +131,11 @@ module.exports.listen = function(http, rooms, users) {
     };
     
     
-/*
+
     console.log('Inicia o banco')
     var players=[];
-    var p1={user:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["florestal","inferno"]}
-    var p2={user:"Player1",password:"12345",nickname:"P1",coins:1000,email:"p1@gmail.com",skins:[]}
+    var p1={user:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["florestal","inferno"],energy:10}
+    var p2={user:"Player1",password:"12345",nickname:"P1",coins:1000,email:"p1@gmail.com",skins:[],energy:10}
     players.push(p1,p2);
     
    users.insert(players, function(err,docs){
@@ -133,21 +143,33 @@ module.exports.listen = function(http, rooms, users) {
             console.log('Saved user:', d.user);
         });
     });
-*/  
+
     var addCoin = function(user, val) {
         users.findOne({"user":user},function(err, res){
-            users.update({"user":res.user}, {$set:{coins:res.coins+val}},function(err, res){
+            if(!(res==null ||res==undefined)){
+                users.update({"user":res.user}, {$set:{coins:res.coins+val}},function(err, res){
+                    console.log('New coin:', res.coins);            
                 console.log('New coin:', res.coins);            
-            });
+                    console.log('New coin:', res.coins);            
+                    return{status:'updated', message: 'sucesso'}
+                });
+            }
+            return{status:'failed', message: 'falhou'}
         });        
     };
 
     var removeCoin = function(user, val) {
         users.findOne({"user":user},function(err, res){
-            users.update({"user":res.user}, {$set:{coins:res.coins-val}},function(err, res){
+            if(!(res==null ||res==undefined)){
+                users.update({"user":res.user}, {$set:{coins:res.coins - val}},function(err, res){
+                    console.log('New coin:', res.coins);            
                 console.log('New coin:', res.coins);            
-            });
-        });        
+                    console.log('New coin:', res.coins);            
+                return{status:'updated', message: 'sucesso'}
+                });
+            }
+            return{status:'failed', message: 'falhou'}
+        });       
     };
 
     io = socketio.listen(http);
@@ -165,52 +187,59 @@ module.exports.listen = function(http, rooms, users) {
 
         socket.on('init', function(roomName) {
 
-                // find the room that the client sent to us
-                rooms.findOne({room: roomName}, function(err, room) {
+            // find the room that the client sent to us
+            rooms.findOne({room: roomName}, function(err, room) {
 
-                    var playerState;
+                var playerState;
 
-                    // check if the room exists
-                    if (room != null) {
+                // check if the room exists
+                if (room != null) {
 
-                        // set the initial playerState
-                        playerState = { 'players': room.players, 'ships':  ships, 'id': socket.id, 'room': roomName };
+                    // set the initial playerState
+                    playerState = { 'players': room.players, 'ships':  ships, 'id': socket.id, 'room': roomName };
 
-                        if (room.players.length == 1) {
+                    if (room.players.length == 1) {
 
-                            // add the current player to the playerstate's players
-                            playerState.players.push({'id': socket.id, 'canFire': false, 'ready': false, 'takenHits': 0, 'ships' : ships });
+                        // add the current player to the playerstate's players
+                        playerState.players.push({'id': socket.id, 'canFire': false, 'ready': false, 'takenHits': 0, 'ships' : ships });
 
-                            // add the current player to players
-                            rooms.update({room: roomName}, {$addToSet : { players: {'id': socket.id, 'canFire': false, 'ready': false, 'takenHits': 0, 'ships' : ships } } }, {}, function(obj, nch) {});
-
-                        }
-                        // if the room is full, prevent another player from joining the room
-                        else if (room.players.length == 2){
-                            return;
-                        }
-                    } else { // room does not exist
-
-                        //generate an unique roomname
+                        // add the current player to players
+                        rooms.update({room: roomName}, {$addToSet : { players: {'id': socket.id, 'canFire': false, 'ready': false, 'takenHits': 0, 'ships' : ships } } }, {}, function(obj, nch) {});
+                        setInProgress(roomName);
+                    }
+                    // if the room is full, prevent another player from joining the room
+                    else if (room.players.length == 2){
                         roomName = uniqid();
 
-                        // create a new player state
                         playerState =  { 'players': [ {'id': socket.id,'ready': false, 'canFire': false, 'takenHits': 0, 'ships' : ships } ], 'ships': ships, 'id': socket.id, 'room': roomName };
 
                         // create the room and insert the first player (host)
                         rooms.insert({'room' : roomName, 'players' : [ {'id': socket.id, 'ready': false, 'canFire': false, 'takenHits': 0, 'ships' : ships } ]  }, function(err, result) {
                                             
                         });
+                        updateRoomsList(roomName)
                     }
+                } else { // room does not exist
 
-                    socket.join(roomName);
-                    socket.broadcast.to(roomName).emit('playerJoined');
-                    socket.emit('init', playerState);
-                
 
-            });
+                    // create a new player state
+                    playerState =  { 'players': [ {'id': socket.id,'ready': false, 'canFire': false, 'takenHits': 0, 'ships' : ships } ], 'ships': ships, 'id': socket.id, 'room': roomName };
+
+                    // create the room and insert the first player (host)
+                    rooms.insert({'room' : roomName, 'players' : [ {'id': socket.id, 'ready': false, 'canFire': false, 'takenHits': 0, 'ships' : ships } ]  }, function(err, result) {
+                                        
+                    });
+                    updateRoomsList(roomName)
+                }
+
+                socket.join(roomName);
+                socket.broadcast.to(roomName).emit('playerJoined');
+                socket.emit('init', playerState);
+            
 
         });
+
+    });
         
         socket.on('ready', function(obj) {
 
@@ -374,47 +403,67 @@ module.exports.listen = function(http, rooms, users) {
         socket.on('login', function(obj) {   
                 
             users.findOne({'user':obj.user},function(err, res){
-                if(err){console.log(err);
-                    return;} 
-                console.log(obj.user)
-                if(obj.password===res.password){
-                    socket.emit('login', {user:res.user, nickname:res.nickname, coins:res.coins, skin:res.skins, email:res.email})
+                
+                if(res==null ||res==undefined){
+                    socket.emit('login', {error:true,user:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
+                }
+                else if(obj.password===res.password){
+                    socket.emit('login', {error:false,user:res.user, nickname:res.nickname, coins:res.coins, skin:res.skins,energy:res.energy, email:res.email,message:'loged'})
+                }else{
+                    socket.emit('login', {error:true,user:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
                 }
             });
         });
 
         socket.on('updateUser', function(obj){
-            users.update({'user':obj.user}, {$set: { nickname: obj.nickname, email: obj.email }}, function(err, res){
-                socket.emit('updateUser', {nickname:res.nickname, email:res.nickname})
-            });
+            users.findOne({'user':obj.user},function(err, res){
+                if(!(res==null ||res==undefined)){
+                    users.update({'user':obj.user}, {$set: { nickname: obj.nickname, email: obj.email }}, function(err, res){
+                        socket.emit('updateUser', {nickname:res.nickname, email:res.nickname})
+                    })
+                }
+            })
         });
 
         socket.on('purchase', function(obj){
             users.findOne({'user':obj.user},function(err, res){
-                const newSkin=[...res.skins, obj.skin];                
-                users.update({'user':obj.user}, {$set:{skins:newSkin}}, function(err, res){
-                    removeCoin(obj.coins);
-                    socket.emit('purchase', {coins:res.coins, skins:res.skins});
-                })
+                if(!(res==null ||res==undefined)){
+                    const newSkins=[...res.skins, ...obj.skin];
+                    users.update({'user':obj.user}, {$set:{skins:newSkins}}, function(err, res){
+                        payload= removeCoin(obj.coins);
+                        socket.emit('purchase', {coins:res.coins, skins:res.skins, ...payload});
+                    })
+                }else{
+                 socket.emit('purchase', {coins:0, skins:[],status:'failed', message: 'falhou' });
+                }
             })
         });
 
         socket.on('addCredit', function(obj){
-            addCoin(obj.user, obj.coins);
-            socket.emit('addCredit',{coins:res.coins});
+            payload = addCoin(obj.user, obj.coins);
+            socket.emit('addCredit',{coins:res.coins,...payload});
         });
 
         socket.on('updateEnergy', function(obj) {
             users.findOne({'user': obj.user},function(err, res){
                 if (res.energy<=0){
-                    socket.emit('updateEnergy', {can: false, energy :0});
+                    socket.emit('updateEnergy', {coinsEnabled: false, energy :0});
                 }else{
-                    users.update({'user': obj.user}, {$set: {energy: obj.energy}}, function(err, res) {
-                        socket.emit('updateEnergy', {can: true, energy: 0});
+                    users.update({'user': obj.user}, {$set: {energy: res.energy-1}}, function(err, res) {
+                        socket.emit('updateEnergy', {coinsEnabled: true, energy: 0});
                     })
                 }
             })
         });
+
+        socket.on('findRooms',function(){
+            listOfRooms.findOne({'listOfRooms':'listOfRooms'},function(err,res){
+                if(!(res.list==null || res.list==undefined)){
+                    socket.emit('findRooms',{list:res.list})
+                }
+                socket.emit('findRooms',{list:[{roomName:'',inProgress:false}]})
+            })
+        })
 
         socket.on('signIn', function(obj){
             users.findOne({'user':obj.user},function(err, res){				
@@ -422,7 +471,7 @@ module.exports.listen = function(http, rooms, users) {
                     socket.emit('signIn', {status: 'erro', msg: 'Usuário já cadastrado'})
                 }
 				else{
-					const data = {...obj,coins:50,skins:[]}
+					const data = {...obj,coins:50,skins:[],energy:10}
 					users.insert({data}, function(err, res){
 						socket.emit('signIn', {status: 'sucesso', msg: 'Usuário cadastrado com sucesso'})
 					});
@@ -430,7 +479,8 @@ module.exports.listen = function(http, rooms, users) {
             });
         })
     });
-    
+
+
     return io;
 
 }

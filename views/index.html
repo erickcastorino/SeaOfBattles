@@ -24,8 +24,8 @@
       <div id='app'>
         <router-view></router-view>
       </div>
-      <div class="gameContainer">
-        <div class="gameHeader" v-if="room != null && isHost" style=>
+      <div class="gameContainer" style="display:none;">
+        <div class="gameHeader" v-if="room != null && isHost">
           <div class="gameLogo"><img style="height: 200px;"
               src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logotipo.svg"></div>
           <div class="playTogether"><label style="padding-bottom: 20px; margin-right: 5px;" class="control-label"
@@ -124,10 +124,10 @@
         </template>
       </div>
     </div>
-    <p style="color: lightslategray;text-align: right; font-size: large;">Trabalho de Eng. de Software III</p>
   </div>
 </body>
 <script>
+  var logged = false;
   const logoPage = {
     template: '\
     <div class="index">\
@@ -165,67 +165,216 @@
 
   const signUpPage = {
     template: '\
-    <form class="modal-content animate" action="ACAO-DE-CADASTRO.py" method="post">\
+    <form class="modal-content animate">\
         <div class="imgcontainer">\
           <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
           <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg" class="avatar" id="imgClickAndChange" onclick="changeImage()" usemap="#SUB15" />\
           <strong><p style="color: steelblue">CLIQUE NO AVATAR PARA ALTERAR</p></strong>\
         </div>\
         <div class="container">\
-          <input type="email" placeholder="e - m a i l" name="uname" required>\
+          <input id="signInEmail" type="email" placeholder="e - m a i l" name="uname" required>\
     \
-          <input type="text" placeholder="u s e r n a m e" name="psw" minlength="4" required>\
+          <input id="signInUsername" type="text" placeholder="u s e r n a m e" name="psw" minlength="4" required>\
     \
-          <input type="text" placeholder="n i c k n a m e" name="uname" minlength="8" required>\
+          <input id="signInNickname" type="text" placeholder="n i c k n a m e" name="uname" minlength="8" required>\
     \
-          <input type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
+          <input id="signInPassword" type="password" placeholder="p a s s w o r d" name="psw" minlength="8" required>\
     \
-          <button type="submit" class="submit-button">CONFIRMAR</button>\
+          <button onclick="signUp()" >CONFIRMAR</button>\
         </div>\
       </form>'
   }
 
   const mainPage = {
     template: '\
-      <div class="test">\
-      <div class="sidenav"> <br>\
-        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
-        <a href="profile.html">EDITAR PERFIL</a><br><br>\
-        <a href="store.html">LOJA DE BATALHA</a><br><br>\
-        <a href="gold.html">COMPRAR OURO</a><br><br>\
-        <a href="login.html">SAIR DO JOGO</a>\
+    \
+    <div class="main">\
+  <div class="sidenav"> <br>\
+    <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
+    <button id="btn-profile" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
+      document.getElementById(\'profile-modal-content\').style.display=\'flex\'">EDITAR PERFIL</button><br>\
+    <button id="btn-store" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
+      document.getElementById(\'store-modal\').style.display=\'flex\'">LOJA DE BATALHA</button><br>\
+    <button id="btn-gold" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
+      document.getElementById(\'gold-modal\').style.display=\'flex\'">COMPRAR OURO</button><br>\
+    <button id="btn-logout" class="submit-button" onclick="window.location.href=\'index.html\';">SAIR DO JOGO</button>\
+  </div>\
+\
+  <div class="btn-group" style="width: 80%; margin-left: 50%">\
+    <button id="energyCount" style="width:25%; margin-left: 60px">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+    </button>\
+    <button id="coinCount" style="width:25%; margin-left: 60px">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+    </button>\
+  </div>\
+\
+  <p></p>\
+  <p></p>\
+  <p></p>\
+  <p></p>\
+  <p></p>\
+  <p></p>\
+\
+  <div class="btn-group" style="width:100%" >\
+    <button onclick="hostGame()" style="width: 40%; margin-left: 263px">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/target.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+    </button>\
+    <button onclick="checkRooms(); router.push(\'/joinGame\')" style="width: 40%; margin-left: 30px">\
+      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/search.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
+    </button>\
+  </div>\
+  <div id="background-modal" style="display: none;">\
+    <!------------- MODAL EDITAR PERFIL ------------->\
+    <form id="profile-modal-content" class="animate" action="ACAO-DE-EDITAR-PERFIL.py" method="post"\
+      style="display: none">\
+\
+      <div class="imgcontainer-store" style="width: 80%;">\
+\
+        <span style="top: 10px; right: 20px; position: absolute;" onclick="document.getElementById(\'background-modal\').style.display=\'none\';\
+      document.getElementById(\'profile-modal-content\').style.display=\'none\'" class="close">&times;</span>\
+        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg" class="avatar-profile" id="imgClickAndChange" onclick="changeImage()" usemap="#SUB15" />\
+\
+        <strong>\
+          <p style="color: steelblue">CLIQUE NO AVATAR PARA ALTERAR</p>\
+        </strong>\
+\
+\
+        <div class="container">\
+\
+          <input type="text" class="profile-submit" placeholder="n i c k n a m e" name="nickname" minlength="4"\
+            required>\
+\
+          <input type="password" class="profile-submit" placeholder="s e n h a   a t u a l" name="psw" minlength="8"\
+            required>\
+\
+          <input type="password" class="profile-submit" placeholder="n o v a   s e n h a" name="npsw" minlength="8"\
+            required>\
+\
+          <button type="submit" class="submit-button">GRAVAR</button>\
+        </div>\
       </div>\
-    \
-      <div class="btn-group" style="width: 80%; margin-left: 40%">\
-        <button style="width:25%; margin-left: 60px">\
-        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
-        </button>\
-        <button style="width:25%; margin-left: 60px">\
-        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
-        </button>\
-      </div>\
-    \
-      <p> </p> <p> </p> <p> </p> <p> </p> <p> </p> <p> </p>\
-    \
-      <div class="btn-group" style="width:100%">\
-        <button onclick="switchMode();" style="width: 40%; margin-left: 60px">\
-        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/target.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
-        </button>\
-        <button onclick="window.location.href=\'search.html\';" style="width: 40%; margin-left: 60px">\
-        <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/search.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
-        </button>\
-      </div>\
-    \
+    </form>\
+    <!------------- MODAL LOJA DE BATALHA ------------->\
+    <div id="store-modal"\
+      style="display:none; min-width: 60%; max-height: 48%;">\
+      <fieldset><br>\
+        <div class="imgcontainer-store">\
+          <span onclick="document.getElementById(\'background-modal\').style.display=\'none\';\
+      document.getElementById(\'store-modal\').style.display=\'none\'" class="close">&times;</span>\
+        </div>\
+        <br><br>\
+        <br>\
+        <div class="selectionBoxes">\
+        <label class="container-store" >\
+            <input id="floresta_item" type="checkbox" name="items" value="floresta_item" onclick="updatePurchaseModal()"\
+                class="input-store"> Tema Florestal\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/floresta-1/1.png"\
+                style=\'height: 20px; width: 20px;\'>\
+            <span class="checkmark"></span>\
+        </label>\
+        <br>\
+        <br>\
+        <label class="container-store">\
+            <input id="viking_item" type="checkbox" name="items" value="viking_item" onclick="updatePurchaseModal()"\
+                class="input-store"> Tema Viking\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/viking-1/1.png"\
+                style=\'height: 20px; width: 20px;\'>\
+            <span class="checkmark"></span>\
+        </label>\
+        <br>\
+        <br>\
+        <label class="container-store">\
+            <input id="pirata_item" type="checkbox" name="items" value="pirata_item" onclick="updatePurchaseModal()"\
+                class="input-store"> Tema Pirata\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/pirata-1/1.png"\
+                style=\'height: 20px; width: 20px;\'>\
+            <span class="checkmark"></span>\
+        </label>\
+        <br>\
+        <br>\
+        <label class="container-store">\
+            <input id="infernal_item" type="checkbox" name="items" value="infernal_item" onclick="updatePurchaseModal()"\
+                class="input-store"> Tema Infernal\
+            <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/fogo-1/1.png"\
+                style=\'height: 20px; width: 20px;\'>\
+            <span class="checkmark"></span>\
+        </label>\
+        </div>\
+        <br>\
+        <br><input id = "pricingTheme" type="text" placeholder="0 G$" class="input-store" name="total" readonly>\
+        <br>\
+      <button onclick="purchaseThemes()">COMPRAR</button>\
+      </fieldset>\
+\
     </div>\
+\
+\
+<!------------- MODAL COMPRAR OURO ------------->\
+    <div class="modal-content animate" id="gold-modal" action="ACAO-DE-COMPRAR-OURO.py" method="post"\
+    style="display:none; min-width: 50%; max-height: 20%;">\
+      <div class="imgcontainer-store" style="width: 80%;">\
+        <span style="margin: auto; right: 10px;\
+      top: 0;" onclick="document.getElementById(\'background-modal\').style.display=\'none\';\
+      document.getElementById(\'gold-modal\').style.display=\'none\'" class="close">&times;</span>\
+\
+        <br>\
+        <div class="container">\
+          <div class="custom-select">\
+            <select name="method" id="method" style="width: 100%">\
+              <option value="0">FORMA DE PAGAMENTO</option>\
+              <option value="boleto">BOLETO BANCÁRIO</option>\
+              <option value="deposit">DEPóSITO BANCÁRIO</option>\
+              <option value="card">CARTÃO DE CRÉDITO</option>\
+            </select>\
+          </div>\
+          <br>\
+          <div class="custom-select">\
+            <select name="amount" id="amount" style="width: 100%">\
+              <option value="0">QUANTIA DE OURO</option>\
+              <option value="100">R$10 - 100 GOLD</option>\
+              <option value="200">R$15 - 200 GOLD</option>\
+              <option value="500">R$30 - 500 GOLD</option>\
+            </select>\
+          </div>\
+          <br><br>\
+          <button onclick="buyGold()" class="submit-button">COMPRAR</button>\
+        </div>\
+      </div>\
+    </div>\
+  </div>\
+</div>\
     '
   }
   const gameScreen = {
     template: '\
         '
   }
+  const join = {
+    template: '\
+    \
+   <form class="search-modal-content animate">\
+    <div class="imgcontainer">\
+      <strong>\
+        <h3 class="search-title">BUSCAR PARTIDA</h3>\
+      </strong>\
+\
+      <span onclick="window.location.href=\'main.html\'" \
+      class="close">&times;</span>\
+    </div>\
+<br>\
+    <div class="container">\
+     \
+      <input id="hostname" type="text" placeholder="o p o n e n t e" class="search-submit"\
+      name="nickname" minlength="4" required>\
+               \
+      <button onclick="JoinRoom()">PROCURAR</button>       \
+    </div>\
+  </form>\
+        '
+  }
   const errorPage = {
     template: '\
-      \<iframe id="Game" src="http://127.0.0.1:3000/" title="description"></iframe>\
         '
   }
 
@@ -253,12 +402,16 @@
     {
       path: '/home',
       get component() {
-        if (login()) {
+        if (true) {
           return mainPage;
         } else {
           return loginPage;
         }
       }
+    },
+    {
+      path: '/joinGame',
+      component: join
     },
     {
       path: '/gameScreen',
@@ -281,7 +434,6 @@
       }
     }
   })
-
   // 4. Create and mount the root instance.
   // Make sure to inject the router with the router option to make the
   // whole app router-aware.
@@ -309,36 +461,36 @@
 
   function switchMode() {
     gameMode = !gameMode
-    if (gameMode) {
-      window.location.href = '/';
-    }
-    document.getElementById("gameScreen").style = gameMode ? 'display:block;' : 'display:none;';
+    document.getElementById("game").style = gameMode ? 'display:block;' : 'display:none;';
     document.getElementById("app").style = gameMode ? 'display:none;' : 'display:block;';
-    vm.room = 'http://127.0.0.1:3000/'
-    onclick = "login()"
   };
 
   function login() {
-      var socket = io();
-      socket.emit('login',{user:document.getElementById('loginUsername').value,password:document.getElementById('loginPassword').value})
-      socket.on('login',function(obj){
-        if(obj.error==true){
-          alert(obj.message)
-          return false
-        }else{
-          vm.user = obj.user
-          vm.nickname = obj.nickname
-          vm.email = obj.email
-          vm.coins = obj.coins
-          for (var key in vm.ownedShips) {
-            vm.ownedShips[key] = obj.skin.includes(key)
-          }
-          return true
+    var socket = io();
+    socket.emit('login', {
+      user: document.getElementById('loginUsername').value,
+      password: document.getElementById('loginPassword').value
+    })
+    socket.on('login', function (obj) {
+      if (obj.error == true) {
+        alert(obj.message)
+        alert('/loginPage')
+        router.push('/loginPage')
+      } else {
+        vm.username = obj.user
+        console.log(vm.username)
+        vm.nickname = obj.nickname
+        vm.email = obj.email
+        vm.energy = obj.energy
+        vm.coins = obj.coins
+        for (var key in vm.ownedShips) {
+          vm.ownedShips[key] = obj.skin.includes(key)
         }
-      }) 
-      route = vm.user?'/mainPage':'/loginPage'
-      router.push(route)
-    }
+        router.push('/mainPage')
+        alert('/mainPage')
+      }
+    })
+  }
 
   function changeThemeTo(themeSelected) {
     var socket = io();
@@ -357,7 +509,7 @@
     document.getElementById("Game").src = url
   }
 
-  function signUp() {
+  function signUp() { //Falar com fábio pq deu erro de user nulo
     var socket = io();
     socket.emit('signIn', {
       user: document.getElementById('signInUsername').value,
@@ -373,31 +525,161 @@
       }
     })
   }
-  function hostGame(){
+
+  function hostGame() {
     var socket = io()
     updateEnergy();
-    socket.emit('init',vm.username)
-    
+    socket.emit('init', vm.username)
+    switchMode()
+    router.push('/')
   }
-  function joinGame(hostname){
+
+  function joinGame(hostname) {
     updateEnergy();
-    socket.emit('init',hostname)
-    
+    socket.emit('init', hostname)
+    switchMode()
+    router.push('/')
   }
 
 
   function updateEnergy() {
     var socket = io();
-    socket.emit('updateEnergy',{user: vm.username})
+    socket.emit('updateEnergy', {
+      user: vm.username
+    })
     socket.on('updateEnergy', function (res) {
       vm.coinsEnabled = res.coinsEnabled
-      if(res.coinsEnabled){
+      if (res.coinsEnabled) {
         vm.energy = res.energy
-      }
-      else{
+      } else {
         alert('Você não ganhará nenhuma moeda nesta batalha')
       }
     })
+  }
+
+  function updatePurchaseModal() {
+    var itemCost = 0
+    var themesSelected = {
+      'floresta': false,
+      'viking': false,
+      'pirata': false,
+      'infernal': false
+    }
+    var itemsPricing = new Array();
+    itemsPricing["floresta"] = 50;
+    itemsPricing["viking"] = 100;
+    itemsPricing["pirata"] = 250;
+    itemsPricing["infernal"] = 500;
+
+    for (var key in themesSelected) {
+      if (vm.ownedShips[key] && document.getElementById(key + "_item").checked) {
+        selectedFlag = document.getElementById(key + "_item").checked = false
+        alert("Você já possui este tema.")
+      }
+      selectedFlag = document.getElementById(key + "_item").checked
+      themesSelected[key] = selectedFlag
+      itemCost += selectedFlag ? itemsPricing[key] : 0
+    }
+    document.getElementById("pricingTheme").value = itemCost + ' G$'
+    console.log(itemCost)
+    console.log(themesSelected)
+  }
+
+  function purchaseThemes() {
+    var themesSelected = {
+      'floresta': false,
+      'viking': false,
+      'pirata': false,
+      'infernal': false
+    }
+    buyingList = new Array();
+    for (var key in themesSelected) {
+      if (document.getElementById(key + "_item").checked) {
+        buyingList.push(key)
+      }
+    }
+    pricing = parseInt(document.getElementById("pricingTheme").value.replace(" G$", ""))
+    console.log({
+      'user': vm.user,
+      'coins': vm.coins,
+      'skins': buyingList
+    })
+    socket.emit('purchase', {
+      'user': vm.user,
+      'coins': vm.coins,
+      'skins': buyingList
+    })
+    socket.on('purchase', function (res) {
+      vm.coins = res.coins
+      if (res.status == "failed") {
+        alert('A compra falhou')
+        document.getElementById('background-modal').style.display = 'none';
+      } else {
+        vm.coins = res.coins
+        for (var key in themesSelected) {
+          vm.ownedShips[key] = obj.skin.includes(key)
+        }
+        document.getElementById('background-modal').style.display = 'none';
+      }
+    })
+  }
+
+  function buyGold() {
+    console.log(document.getElementById('amount').value)
+    socket.emit('addCredit', {
+      'user': vm.user,
+      'coins': document.getElementById('amount').value
+    }) //perguntar fabio sobre como mandar coins
+    socket.on('addCredit', function (res) { //perguntar também sobre payload
+      vm.coins = res.coins
+    })
+
+  }
+
+  function updateWidgets() {
+    document.getElementById("coinCount").value = vm.coins;
+    document.getElementById("energyCount").value = vm.energy;
+  }
+
+  function checkRooms() {
+    socket.emit('findRooms',{})
+    socket.on('findRooms', function (res) {
+      roomList = new Array();
+      roomList = res
+      console.log(res)
+      roomListActive = new Array();
+      for (var room in roomList) {
+        if (room.inProgress && room.roomName != '') {
+          roomListActive.push(room.roomName)
+        }
+      }
+      if(roomListActive.length >0){
+        alert('Os seguintes Joagadores estão online: '+roomListActive.join())
+      }
+      else{alert('Ninguém está online')}
+    })
+  }
+
+  function JoinRoom() { //validar, tavez add botão de procurar jogadores
+    socket.emit('findRooms',{})
+    socket.on('findRooms', function (res) {
+      roomList = new Array();
+      roomList = res
+      console.log(res)
+      roomListActive = new Array();
+      for (var room in roomList) {
+        if (room.inProgress && room.roomName != '') {
+          roomListActive.push(room.roomName)
+        }
+      }
+      if(roomListActive.includes(document.getElementById("hostname").value)){
+        joinGame(document.getElementById("hostname").value) 
+      }
+      else{
+        alert('Jogador não está disponivel para Jogar')
+      }
+    
+
   }
 </script>
 <script type="text/javascript" src="/vue/dist/vue.js"></script>

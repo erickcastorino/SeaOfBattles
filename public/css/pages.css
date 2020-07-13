@@ -1,21 +1,10 @@
 /* ========================= GERAL ======================== */
-.app {
-  position: relative;
-  width: 1280px;
-  height: 720px;
-
-  background: #EAEAEA;
-}
-
-
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: ghostwhite;
 }
 
-input[type=text],
-input[type=email],
-input[type=password] {
+input[type=text], input[type=email], input[type=password] {
   width: 100%;
   padding: 12px 20px;
   margin: 10px 0;
@@ -29,8 +18,8 @@ input[type=password] {
 
 logo {
   margin: 160px 0 12px 0;
-  display: flex;
-  justify-content: center;
+  display: flex;   
+  justify-content: center; 
 }
 
 logo:hover {
@@ -45,7 +34,18 @@ button {
   border: none;
   cursor: pointer;
   width: 100%;
-  font-weight: bold
+  font-weight:bold
+}
+
+.buttonWidget {
+  background-color: steelblue;
+  color: ghostwhite;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-weight:bold
 }
 
 .submit-button:hover {
@@ -103,50 +103,37 @@ span.psw {
 }
 
 @-webkit-keyframes animatezoom {
-  from {
-    -webkit-transform: scale(0)
-  }
-
-  to {
-    -webkit-transform: scale(1)
-  }
+  from {-webkit-transform: scale(0)} 
+  to {-webkit-transform: scale(1)}
 }
-
+  
 @keyframes animatezoom {
-  from {
-    transform: scale(0)
-  }
-
-  to {
-    transform: scale(1)
-  }
+  from {transform: scale(0)} 
+  to {transform: scale(1)}
 }
 
 @media screen and (max-width: 300px) {
   span.psw {
-    display: block;
-    float: none;
+     display: block;
+     float: none;
   }
 }
-
 .close {
   position: absolute;
-  right: 40px;
+  right: 20px;
   top: 0;
   color: steelblue;
   font-size: 35px;
   font-weight: bold;
 }
-
 .close:hover,
 .close:focus {
   color: crimson;
   cursor: pointer;
   transform: scale(2)
 }
-
 /* =========================  INDEX  ======================== */
-body.index {
+body.index{
   font-family: Arial, Helvetica, sans-serif;
   background-color: ghostwhite;
   overflow: hidden;
@@ -163,13 +150,11 @@ body.index {
   margin-right: auto;
   opacity: 0.5;
 }
-
-.logo-index:hover {
+.logo-index:hover{
   opacity: 1;
   cursor: pointer;
   transform: scale(1.2);
 }
-
 /* ========================= LOGIN ======================== */
 .modal-content {
   background-color: ghostwhite;
@@ -178,11 +163,9 @@ body.index {
   width: 50%;
   animation: animatezoom 2s;
 }
-
 img.avatar-login {
   width: 20%;
 }
-
 /* =========================  PROFILE  ======================== */
 
 input.profile-submit {
@@ -196,25 +179,21 @@ input.profile-submit {
   color: steelblue;
   background-color: ghostwhite;
 }
-
-.profile-modal-content {
-  background-color: ghostwhite;
-  margin: 2% auto 2% auto;
-  border: 2px solid steelblue;
-  width: 50%;
-  animation: animatezoom 1.5s;
-}
-
 img.avatar-profile {
   width: 25%;
   border-radius: 50%;
   border: 2px solid steelblue;
 }
-
+#profile-modal-content {
+  background-color: ghostwhite;
+  margin: auto;
+  border: 2px solid steelblue;
+  width: 50%;
+  animation: animatezoom 1.5s;
+}
 /* ========================= MAIN  ======================== */
-.test {
-  font-family: "Lato", sans-serif;
-  Arial;
+body.main {
+  font-family: "Lato", sans-serif; Arial;
   background-color: ghostwhite;
   overflow: hidden;
   text-align: center;
@@ -253,14 +232,23 @@ img.avatar-profile {
   float: left;
   background-color: ghostwhite;
 }
-
+#background-modal{
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-content: center;
+  z-index: 3;
+}
 
 /* ========================= SIGNUP  ======================== */
 img.avatar-signup {
   width: 20%;
   border-radius: 50%;
 }
-
 /* ===========================  STORE  ======================== */
 fieldset {
   background-color: ghostwhite;
@@ -278,7 +266,7 @@ fieldset {
 }
 
 .container-store {
-  display: block;
+  /* display: block; */
   position: relative;
   padding-left: 35px;
   margin-bottom: 12px;
@@ -307,12 +295,12 @@ fieldset {
   background-color: lightsteelblue;
 }
 
-.container-store:hover input~.checkmark {
-  background-color: steelblue;
-  opacity: 0.8;
+.container-store:hover input ~ .checkmark {
+    background-color:steelblue;
+    opacity:0.8;
 }
 
-.container-store input:checked~.checkmark {
+.container-store input:checked ~ .checkmark {
   background-color: steelblue;
 }
 
@@ -322,7 +310,7 @@ fieldset {
   display: none;
 }
 
-.container-store input:checked~.checkmark:after {
+.container-store input:checked ~ .checkmark:after {
   display: block;
 }
 
@@ -337,7 +325,6 @@ fieldset {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
-
 .input-store[type=text] {
   width: 100%;
   padding: 12px 20px;
@@ -348,7 +335,7 @@ fieldset {
   text-align: center;
   color: steelblue;
   background-color: ghostwhite;
-  font-weight: bold;
+  font-weight:bold;
 }
 
 
@@ -356,12 +343,11 @@ fieldset {
 
 /* ========================= START ======================== */
 .v-center {
-  min-height: 200px;
+  min-height:200px;
   display: flex;
-  justify-content: center;
+  justify-content:center;
   flex-flow: column wrap;
 }
-
 /* ========================= SEARCH ======================== */
 
 input.search-submit {
@@ -375,7 +361,6 @@ input.search-submit {
   color: steelblue;
   background-color: ghostwhite;
 }
-
 .search-modal-content {
   background-color: ghostwhite;
   margin: 2% auto 2% auto;
@@ -383,22 +368,16 @@ input.search-submit {
   width: 50%;
   animation: animatezoom 1.5s;
 }
-
-h3.search-title {
-  color: steelblue;
-  padding-top: 12px;
+h3.search-title{
+    color: steelblue;
+    padding-top:12px;
 }
-
 /* ========================= GOLD ======================== */
 .custom-select {
   text-align: center;
-  position: relative;
   font-family: Helvetica, sans-serif;
 }
 
-.custom-select select {
-  display: none;
-}
 
 .select-selected {
   background-color: lightsteelblue;
@@ -420,8 +399,7 @@ h3.search-title {
   top: 7px;
 }
 
-.select-items div,
-.select-selected {
+.select-items div,.select-selected {
   color: steelblue;
   padding: 8px 16px;
   border: 2px solid transparent;
@@ -443,11 +421,9 @@ h3.search-title {
   display: none;
 }
 
-.select-items div:hover,
-.same-as-selected {
+.select-items div:hover, .same-as-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
-
 .modal-content-gold {
   background-color: ghostwhite;
   margin: 2% auto 2% auto;
@@ -455,6 +431,7 @@ h3.search-title {
   width: 50%;
   animation: animatezoom 2s;
 }
+
 /*===================DropDown=======================*/
 .dropbtn {
   background-color: darkslategray;
@@ -580,6 +557,15 @@ h3.search-title {
 }
 .dropdownButton{
   flex: 1;
+}
+
+.selectionBoxes{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  text-align: left;
+  padding-left: 80px;
 }
 /*=======================Tile/table======================*/
 
