@@ -148,10 +148,12 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         users.findOne({"user":user},function(err, res)
         {console.log({"user":user})
             if(!(res==null ||res==undefined)){
-                users.update({"user":res.user}, {$set:{coins:res.coins+val}},function(err, res){
+                console.log('Old coin:', res.coins);
+                users.update({"user":res.user}, {$set:{coins:parseInt(res.coins)+parseInt(val)}},function(err, res){
                     console.log('New coin:', res.coins);            
                 console.log('New coin:', res.coins);            
-                    console.log('New coin:', res.coins);            
+                    console.log('New coin:', res.coins); 
+                    console.log(res)           
                     return{status:'updated', message: 'sucesso'}
                 });
             }
