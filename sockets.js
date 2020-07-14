@@ -428,14 +428,14 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         });
 
         socket.on('purchase', function(obj){
-            users.findOne({'user':obj.username},function(err, res){
+            users.findOne({'username':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
                     console.log("Old Skins", res.skins)
                     const newSkins=[...res.skins, ...obj.skins];
                     console.log("New Skins",newSkins)
                     users.update({'username':obj.username}, {$set:{skins: newSkins}}, function(err, res){
                     })
-                    removeCoin(obj.coins);
+                    removeCoin(res.username, obj.coins);
                     users.findOne({'username':obj.username},function(err, res){
                         console.log(res.skins)
                         socket.emit('purchase', {coins: res.coins, skins:res.skins, status:'success', message: 'OK' });  

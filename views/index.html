@@ -65,7 +65,7 @@
                 </form>
               </div>
             </div>
-              <span class="closeAlt" onclick="router.push('/mainPage'); switchMode(); updateWidgets()">&times;</span>
+              <span class="closeAlt" onclick="router.push('/mainPage'); switchMode(); setTimeout(function(){updateWidgets()}, 500); ">&times;</span>
           </div>
           <div v-show="!ready" class="shipPlacement">
             <div class="shipSelection">
@@ -359,7 +359,7 @@
         <h3 class="search-title">BUSCAR PARTIDA</h3>\
       </strong>\
 \
-      <span onclick="router.push(\'/mainPage\'); updateWidgets()" \
+      <span onclick="router.push(\'/mainPage\'); setTimeout(function(){updateWidgets()}, 500);" \
       class="close">&times;</span>\
     </div>\
 <br>\
@@ -492,7 +492,7 @@
           vm.ownedShips[key] = obj.skins.includes(key)
         }
         router.push('/mainPage');
-        updateWidgets();
+        setTimeout(function(){updateWidgets()}, 500);
         logged = true;
       }
     })
@@ -581,6 +581,7 @@ function fillEnergy() {
       alert('Você não ganhará nenhuma moeda nesta batalha')
     }
   })
+  setTimeout(function(){updateWidgets()}, 500);
 }
 
   function updatePurchaseModal() {
@@ -612,6 +613,7 @@ function fillEnergy() {
   }
 
   function purchaseThemes() {
+    var itemsPricing = new Array();
     var themesSelected = {
       'floresta': false,
       'viking': false,
@@ -627,27 +629,30 @@ function fillEnergy() {
     pricing = parseInt(document.getElementById("pricingTheme").value.replace(" G$", ""))
     console.log({
       'username': vm.username,
-      'coins': vm.coins,
+      'coins': pricing,
       'skins': buyingList
     })
     socket.emit('purchase', {
       'username': vm.username,
-      'coins': vm.coins,
+      'coins': pricing,
       'skins': buyingList
     })
     socket.on('purchase', function (res) {
       vm.coins = res.coins
       if (res.status == "failed") {
         alert('A compra falhou')
-        document.getElementById('background-modal').style.display = 'none';
+        document.getElementById('background-modal').style.display='flex';
+        document.getElementById('profile-modal-content').style.display='flex'
       } else {
-        vm.coins = res.coins
+        vm.coins = vm.coins - pricing
         for (var key in themesSelected) {
-          vm.ownedShips[key] = obj.skin.includes(key)
+          vm.ownedShips[key] = res.skins.includes(key)
         }
-        document.getElementById('background-modal').style.display = 'none';
+        document.getElementById('background-modal').style.display='flex';
+        document.getElementById('profile-modal-content').style.display='flex'
       }
     })
+    setTimeout(function(){updateWidgets()}, 500);
   }
 
   function buyGold() {
@@ -659,7 +664,7 @@ function fillEnergy() {
     socket.on('addCredit', function (res) { 
       vm.coins = res.coins
     })
-
+    setTimeout(function(){updateWidgets()}, 500);
   }
 
   function updateWidgets() {
