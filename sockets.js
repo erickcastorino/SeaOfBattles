@@ -14,7 +14,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
             list=res.list
             room=list.find(room => room.roomName===roomName)
             list.pop(room)
-            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:list}})
+            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:[...list]}})
         })
     }
     var setInProgress=function(roomName){
@@ -196,7 +196,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
             })
             // find the room that the client sent to us
             rooms.findOne({room: roomName}, function(err, room) {
-
+                console.log(roomName,'rooms',room)
                 var playerState;
 
                 // check if the room exists
@@ -386,6 +386,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
                         rooms.remove({"players.id": socket.id}, function(err, nr) {
 
                         });
+                        console.log(res.room)
                         removeRoomsList(res.room)
                     } else {
 
@@ -474,17 +475,18 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         })
 
         socket.on('signIn', function(obj){
-            users.findOne({'username':obj.username},function(err, res){	
+            users.findOne({'username':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
                     socket.emit('signIn', {status: 'erro', msg: 'Usuário já cadastrado'})
                 }
-				else{
-                    const data = {username:obj.userName,email:obj.email,nickname:obj.nickname,password:obj.password ,coins:50,skins:[],energy:10}
-					users.insert({...data}, function(err, res){
-						socket.emit('signIn', {status: 'sucesso', msg: 'Usuário cadastrado com sucesso'})
+                else{
+                    const data = {username:obj.username,email:obj.email,nickname:obj.nickname,password:obj.password ,coins:50,skins:[],energy:10}
+                    console.log({username:obj.username,email:obj.email,nickname:obj.nickname,password:obj.password ,coins:50,skins:[],energy:10})
+                    users.insert(data, function(err, res){
+                        socket.emit('signIn', {status: 'sucesso', msg: 'Usuário cadastrado com sucesso'})
                     });
                     users.findOne({'userName':obj.userName},function(error,res){console.log(res)})
-				}			
+                }
             });
         })
 
