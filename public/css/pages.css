@@ -477,7 +477,7 @@ h3.search-title{
 
 .dropdown-content a:hover {background-color: #ddd;}
 
-.dropdown:hover .dropdown-content {display: block; left: 100%; bottom: 100%;}
+.dropdown:hover .dropdown-content {display: block; left: 50%; bottom: 100%;}
 
 .dropdown:hover .dropbtn {background-color:rgb(63, 105, 105);}
 

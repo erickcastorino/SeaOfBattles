@@ -70,7 +70,7 @@
           <div v-show="!ready" class="shipPlacement">
             <div class="shipSelection">
               <div class="shipSelectionFirstRow">
-                <h3>Navios Pendentes <button class="btnshipSelection" @click="rotated = !rotated" type="button">Rodar
+                <h3>Navios Pendentes <button class="btnshipSelection" @click="rotated = !rotated" type="button" style="display: none;">Rodar
                     navio para a
                     {{rotated ? 'vertical' : 'horizontal'}}</button></h3>
               </div>
@@ -87,11 +87,11 @@
                 <div class="dropdown">
                   <button class="dropbtn">Temas</button>
                   <div class="dropdown-content">
-                    <a onclick="changeThemeTo('basico')">Tema Básico</a>
-                    <a onclick="changeThemeTo('viking')">Tema Viking</a>
-                    <a onclick="changeThemeTo('floresta')">Tema Florestal</a>
-                    <a onclick="changeThemeTo('infernal')">Tema Infernal</a>
-                    <a onclick="changeThemeTo('pirata')">Tema Pirata</a>
+                    <a onclick="changeThemeTo('basico')"v-if="ownedShips['infernal']">Tema Básico</a>
+                    <a onclick="changeThemeTo('viking')"v-if="ownedShips['viking']">Tema Viking</a>
+                    <a onclick="changeThemeTo('floresta')"v-if="ownedShips['floresta']">Tema Florestal</a>
+                    <a onclick="changeThemeTo('infernal')"v-if="ownedShips['inferno']">Tema Infernal</a>
+                    <a onclick="changeThemeTo('pirata')"v-if="ownedShips['pirata']">Tema Pirata</a>
                   </div>
                 </div>
               </div>
