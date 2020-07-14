@@ -12,7 +12,7 @@
     "bower": "^1.8.8",
     "express": "^4.13.4",
     "nedb": "^1.8.0",
-    "socket.io": "^1.4.5",
+    "socket.io": "^2.3.0",
     "uniqid": "^1.0.0",
     "vue-template-loader": "^1.1.0"
   }

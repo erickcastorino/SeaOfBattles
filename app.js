@@ -9,7 +9,7 @@ var Datastore = require('nedb'),
 
 var io = require('./sockets').listen(http, rooms, users,listOfRooms);
 
-var port = 3000;
+var port = process.env.PORT || 3000;
 var DEBUG = true;
 
 app.use(express.static(__dirname + '/bower_components'));

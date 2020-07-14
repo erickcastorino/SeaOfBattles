@@ -221,7 +221,7 @@
     <button onclick="hostGame()" style="width: 40%; margin-left: 263px">\
       <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/target.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
     </button>\
-    <button onclick="checkRooms(); router.push(\'/joinGame\')" style="width: 40%; margin-left: 30px">\
+    <button onclick="checkRooms()" style="width: 40%; margin-left: 30px">\
       <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/search.svg" style="width: 80%; display: block; margin-left: auto; margin-right: auto">\
     </button>\
   </div>\
@@ -417,6 +417,10 @@
     {
       path: '/',
       component: gameScreen
+    },   
+    {
+      path: '/joinGame',
+      component: join
     },
   ]
   // 3. Create the router instance and pass the `routes` option
@@ -461,9 +465,10 @@
   };
 
   function switchMode() {
+    console.log('switch')
     gameMode = !gameMode
-    document.getElementById("gameScreen").style = gameMode ? 'display:block;' : 'display:flex;';
-    document.getElementById("app").style = gameMode ? 'display:flex;' : 'display:block;';
+    document.getElementById("gameScreen").style = gameMode ? 'display:flex;' : 'display:none;';
+    document.getElementById("app").style = gameMode ? 'display:none;' : 'display:flex;';
   };
 
   function login() {
@@ -488,7 +493,6 @@
           vm.ownedShips[key] = obj.skin.includes(key)
         }
         router.push('/mainPage')
-        alert('/mainPage')
         logged = true
       }
     })
@@ -531,15 +535,18 @@
   function hostGame() {
     var socket = io()
     updateEnergy();
-    socket.emit('init', vm.username)
     switchMode()
     router.push('/')
+    console.log()
+    socket.emit('init', vm.username)
   }
 
   function joinGame(hostname) {
+    var socket = io()
     updateEnergy();
-    socket.emit('init', hostname)
     switchMode()
+    console.log('asdadsadasd')
+    socket.emit('init', hostname)
     router.push('/')
   }
 
@@ -646,41 +653,42 @@
   function checkRooms() {
     socket.emit('findRooms',{})
     socket.on('findRooms', function (res) {
-      roomList = new Array();
-      roomList = res
-      console.log(res)
-      roomListActive = new Array();
+      roomList = res.list;
+      roomListActive = [] ;
       for (var room in roomList) {
-        if (room.inProgress && room.roomName != '') {
-          roomListActive.push(room.roomName)
+        if (!roomList[room].inProgress && roomList[room].roomName != '') {
+          roomListActive =[...roomListActive,roomList[room].roomName]
         }
       }
       if(roomListActive.length >0){
-        alert('Os seguintes Joagadores estão online: '+roomListActive.join())
+        router.push('\joinGame')
+        alert('Os seguintes Joagadores estão online: ' + `${roomListActive}` )
       }
-      else{alert('Ninguém está online')}
+       else{alert('Ninguém está online')}
     })
   }
 
   function JoinRoom() { //validar, tavez add botão de procurar jogadores
     socket.emit('findRooms',{})
     socket.on('findRooms', function (res) {
-      roomList = new Array();
-      roomList = res
-      console.log(res)
-      roomListActive = new Array();
+      roomList = res.list
+      roomListActive = [] ;
+      available=false
       for (var room in roomList) {
-        if (room.inProgress && room.roomName != '') {
-          roomListActive.push(room.roomName)
+        if (!roomList[room].inProgress && roomList[room].roomName != '') {
+          roomListActive =[...roomListActive,roomList[room].roomName]
         }
       }
-      if(roomListActive.includes(document.getElementById("hostname").value)){
-        joinGame(document.getElementById("hostname").value) 
+      if(!roomListActive.includes(document.getElementById("hostname").value)){
+        console.log('teste')
+        available=true
       }
+      if(available){
+      joinGame(document.getElementById("hostname").value)} 
       else{
         alert('Jogador não está disponivel para Jogar')
       }})
-    
+      
 
   }
 </script>

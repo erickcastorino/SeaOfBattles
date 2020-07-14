@@ -1,6 +1,5 @@
 var socket = io();
 
-
 socket.emit('init', window.location.pathname.substring(1, window.location.pathname.length));
 
 socket.on('init', function(obj) {
@@ -11,7 +10,6 @@ socket.on('init', function(obj) {
     if (obj.players.length == 2)
         vm.statusMessage = 'Navios Pendentes';
 
-    console.log(obj.players);
     obj.players.forEach(function(e, i) {
         if (e.id != obj.id)
             if (e.ready) {
@@ -37,7 +35,6 @@ socket.on('gameover', function(players) {
         if (players[i].id != vm.playerState.id) opponent = players[i];
     }
 
-    console.log(opponent);
 
     for (var i = 0; i < opponent.ships.length; i++) {
 
@@ -52,7 +49,6 @@ socket.on('gameover', function(players) {
 
 socket.on('canFire', function(obj) {
     // check if current user or opponent can fire
-    console.log(obj.id + '  ' + vm.playerState.id);
     if(vm.playerState.id == obj.id)
         vm.canFire = true;
     else
@@ -70,7 +66,6 @@ socket.on('opponentLeft', function () {
 socket.on('opponentReady', function() {
     vm.opponentReady = true;
     vm.statusMessage = 'Pronto';
-    console.log('opponent is ready');
 });
 
 socket.on('win', function() {
@@ -102,7 +97,6 @@ socket.on('takeFire', function(obj) {
 
 socket.on('hit', function(obj) {
 
-    console.log('hit ' + obj.hit);
 
     if (obj.hit) {
         document.querySelector('[data-opcords="'+ obj.cords +'"]').style.backgroundColor = "red";
@@ -286,7 +280,8 @@ var vm = new Vue({
         componentKey: 0,
         theme: 'basico',
         userId: '',
-        username: '',
+        username: 'Player1',
+        password: '12345',
         ownedShips: {'floresta' :false,
                      'viking'   :false,
                      'pirata'	:false,
