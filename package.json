@@ -4,8 +4,7 @@
   "description": "Multiplayer battleship",
   "main": "app.js",
   "scripts": {
-    "postinstall": "bower cache clean && bower install",
-  "start": "node app.js"
+  "start": "bower cache clean && bower install && node app.js"
   },
   "author": "Arend van Erk",
   "license": "GNU",
