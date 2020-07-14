@@ -65,7 +65,7 @@
                 </form>
               </div>
             </div>
-              <span class="closeAlt" onclick="router.push('/mainPage'); switchMode()">&times;</span>
+              <span class="closeAlt" onclick="router.push('/mainPage'); switchMode(); updateWidgets()">&times;</span>
           </div>
           <div v-show="!ready" class="shipPlacement">
             <div class="shipSelection">
@@ -194,6 +194,7 @@
     <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/logo.svg" style="width: 50%; display: block; margin-left: auto; margin-right: auto"><br><br>\
     <button id="btn-profile" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
       document.getElementById(\'profile-modal-content\').style.display=\'flex\'">EDITAR PERFIL</button><br>\
+    <button id="btn-profile" class="submit-button" onclick="fillEnergy()">PREENCHER ENERGIA(400G)</button><br>\
     <button id="btn-store" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
       document.getElementById(\'store-modal\').style.display=\'flex\'">LOJA DE BATALHA</button><br>\
     <button id="btn-gold" class="submit-button" onclick="document.getElementById(\'background-modal\').style.display=\'flex\';\
@@ -360,7 +361,7 @@
         <h3 class="search-title">BUSCAR PARTIDA</h3>\
       </strong>\
 \
-      <span onclick="router.push(\'/mainPage\')" \
+      <span onclick="router.push(\'/mainPage\'); updateWidgets()" \
       class="close">&times;</span>\
     </div>\
 <br>\
@@ -474,7 +475,7 @@
   function login() {
     var socket = io();
     socket.emit('login', {
-      user: document.getElementById('loginUsername').value,
+      username: document.getElementById('loginUsername').value,
       password: document.getElementById('loginPassword').value
     })
     socket.on('login', function (obj) {
@@ -483,17 +484,18 @@
         alert('/loginPage')
         router.push('/loginPage')
       } else {
-        vm.username = obj.user
+        vm.username = obj.username
         console.log(vm.username)
         vm.nickname = obj.nickname
         vm.email = obj.email
         vm.energy = obj.energy
         vm.coins = obj.coins
         for (var key in vm.ownedShips) {
-          vm.ownedShips[key] = obj.skin.includes(key)
+          vm.ownedShips[key] = obj.skins.includes(key)
         }
-        router.push('/mainPage')
-        logged = true
+        router.push('/mainPage');
+        updateWidgets();
+        logged = true;
       }
     })
   }
@@ -518,7 +520,7 @@
   function signUp() { //Falar com fábio pq deu erro de user nulo
     var socket = io();
     socket.emit('signIn', {
-      user: document.getElementById('signInUsername').value,
+      username: document.getElementById('signInUsername').value,
       password: document.getElementById('signInPassword').value,
       email: document.getElementById('signInEmail').value,
       nickname: document.getElementById('signInNickname').value
@@ -554,7 +556,7 @@
   function updateEnergy() {
     var socket = io();
     socket.emit('updateEnergy', {
-      user: vm.username
+      username: vm.username
     })
     socket.on('updateEnergy', function (res) {
       vm.coinsEnabled = res.coinsEnabled
@@ -565,6 +567,21 @@
       }
     })
   }
+
+function fillEnergy() {
+  var socket = io();
+  socket.emit('addEnergy', {
+    username: vm.username
+  })
+  socket.on('addEnergy', function (res) {
+    vm.coinsEnabled = res.coinsEnabled
+    if (res.coinsEnabled) {
+      vm.energy = res.energy
+    } else {
+      alert('Você não ganhará nenhuma moeda nesta batalha')
+    }
+  })
+}
 
   function updatePurchaseModal() {
     var itemCost = 0
@@ -609,12 +626,12 @@
     }
     pricing = parseInt(document.getElementById("pricingTheme").value.replace(" G$", ""))
     console.log({
-      'user': vm.username,
+      'username': vm.username,
       'coins': vm.coins,
       'skins': buyingList
     })
     socket.emit('purchase', {
-      'user': vm.username,
+      'username': vm.username,
       'coins': vm.coins,
       'skins': buyingList
     })
@@ -636,10 +653,10 @@
   function buyGold() {
     console.log(document.getElementById('amount').value)
     socket.emit('addCredit', {
-      'user': vm.username,
+      'username': vm.username,
       'coins': document.getElementById('amount').value
-    }) //perguntar fabio sobre como mandar coins
-    socket.on('addCredit', function (res) { //perguntar também sobre payload
+    }) 
+    socket.on('addCredit', function (res) { 
       vm.coins = res.coins
     })
 
@@ -649,7 +666,7 @@
     var energyCount = document.getElementById("energyCountText"); 
     var coinCount = document.getElementById("coinCountText"); 
     coinCount.innerHTML =vm.coins.toString().padStart(4,'0')
-    energyCount.innerHTML =vm.energy.toString().padStart(3,'0')
+    energyCount.innerHTML =vm.energy.toString().padStart(3,'0')+'/10'
   }
 
   function checkRooms() {
@@ -670,7 +687,7 @@
     })
   }
 
-  function JoinRoom() { //validar, tavez add botão de procurar jogadores
+  function JoinRoom() { 
     socket.emit('findRooms',{})
     socket.on('findRooms', function (res) {
       roomList = res.list
