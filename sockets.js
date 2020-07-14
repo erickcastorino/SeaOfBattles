@@ -141,24 +141,24 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
     };
     
     
-
-//     console.log('Inicia o banco')
-//     var players=[];
-//     var p1={user:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["florestal","inferno"],energy:10}
-//     var p2={user:"Player1",password:"12345",nickname:"P1",coins:1000,email:"p1@gmail.com",skins:[],energy:10}
-//     players.push(p1,p2);
+/*
+    console.log('Inicia o banco')
+    var players=[];
+    var p1={username:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["florestal","inferno"],energy:10}
+    var p2={username:"Player1",password:"12345",nickname:"P1",coins:1000,email:"p1@gmail.com",skins:[],energy:10}
+    players.push(p1,p2);
     
-//    users.insert(players, function(err,docs){
-//         docs.forEach(function(d){
-//             console.log('Saved user:', d.user);
-//         });
-//     });
-
-    var addCoin = function(user, val) {
-        users.findOne({"user":user},function(err, res)
+   users.insert(players, function(err,docs){
+        docs.forEach(function(d){
+            console.log('Saved user:', d.user);
+        });
+    });
+*/
+    var addCoin = function(username, val) {
+        users.findOne({"username":username},function(err, res)
         {
             if(!(res==null ||res==undefined)){
-                users.update({"user":res.user}, {$set:{coins:parseInt(res.coins)+parseInt(val)}},function(err, res){        
+                users.update({"username":res.username}, {$set:{coins:parseInt(res.coins)+parseInt(val)}},function(err, res){        
                     return{status:'updated', message: 'sucesso'}
                 });
             }
@@ -166,10 +166,10 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         });        
     };
 
-    var removeCoin = function(user, val) {
-        users.findOne({"user":user},function(err, res){
+    var removeCoin = function(username, val) {
+        users.findOne({"username":username},function(err, res){
             if(!(res==null ||res==undefined)){
-                users.update({"user":res.user}, {$set:{coins:parseInt(res.coins) - parseInt(val)}},function(err, res){            
+                users.update({"username":res.username}, {$set:{coins:parseInt(res.coins) - parseInt(val)}},function(err, res){            
                     console.log('New coin:', res.coins);            
                 });
             }
@@ -402,23 +402,23 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
 
         socket.on('login', function(obj) {   
                 
-            users.findOne({'user':obj.user},function(err, res){
+            users.findOne({'username':obj.username},function(err, res){
                 
                 if(res==null ||res==undefined){
-                    socket.emit('login', {error:true,user:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
+                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
                 }
                 else if(obj.password===res.password){
-                    socket.emit('login', {error:false,user:res.user, nickname:res.nickname, coins:res.coins, skin:res.skins,energy:res.energy, email:res.email,message:'loged'})
+                    socket.emit('login', {error:false,username:res.username, nickname:res.nickname, coins:res.coins, skin:res.skins,energy:res.energy, email:res.email,message:'loged'})
                 }else{
-                    socket.emit('login', {error:true,user:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
+                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
                 }
             });
         });
 
         socket.on('updateUser', function(obj){
-            users.findOne({'user':obj.user},function(err, res){
+            users.findOne({'username':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
-                    users.update({'user':obj.user}, {$set: { nickname: obj.nickname, email: obj.email }}, function(err, res){
+                    users.update({'username':obj.username}, {$set: { nickname: obj.nickname, email: obj.email }}, function(err, res){
                         socket.emit('updateUser', {nickname:obj.nickname, email:obj.nickname})
                     })
                 }
@@ -426,13 +426,13 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         });
 
         socket.on('purchase', function(obj){
-            users.findOne({'user':obj.user},function(err, res){
+            users.findOne({'user':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
                     const newSkins=[...res.skins, ...obj.skin];
-                    users.update({'user':obj.user}, {$set:{skins:newSkins}}, function(err, res){
+                    users.update({'username':obj.username}, {$set:{skins:newSkins}}, function(err, res){
                     })
                     payload= removeCoin(obj.coins);
-                    users.findOne({'user':obj.user},function(err, res){
+                    users.findOne({'username':obj.username},function(err, res){
                         socket.emit('purchase', {coins: res.coins, skins:res.skins, ...payload});  
                     })
                 }else{
@@ -442,18 +442,18 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         });
 
         socket.on('addCredit', function(obj){
-            payload = addCoin(obj.user, obj.coins);
-            users.findOne({'user':obj.user},function(err, res){
+            payload = addCoin(obj.username, obj.coins);
+            users.findOne({'username':obj.username},function(err, res){
                 socket.emit('addCredit',{coins:res.coins,...payload}); 
           })
         });
 
         socket.on('updateEnergy', function(obj) {
-            users.findOne({'user': obj.user},function(err, res){
+            users.findOne({'username': obj.username},function(err, res){
                 if (res.energy<=0){
                     socket.emit('updateEnergy', {coinsEnabled: false, energy :0});
                 }else{
-                    users.update({'user': obj.user}, {$set: {energy: res.energy-1}}, function(err, res) {
+                    users.update({'username': obj.username}, {$set: {energy: res.energy-1}}, function(err, res) {
                     })
                     socket.emit('updateEnergy', {coinsEnabled: true, energy: res.energy-1});
                 }
@@ -470,8 +470,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         })
 
         socket.on('signIn', function(obj){
-            users.findOne({'user':obj.user},function(err, res){				
-                if(obj.user===res.user){
+            users.findOne({'username':obj.username},function(err, res){				
+                if(obj.username===res.username){
                     socket.emit('signIn', {status: 'erro', msg: 'Usuário já cadastrado'})
                 }
 				else{
@@ -482,9 +482,13 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
 				}			
             });
         })
+        socket.on('addEnergy', function(obj){
+            users.update({'username': obj.username}, {$set: {energy: 10}}, function(err, res) {
+            })
+
+            socket.emit('updateEnergy',{energy: 10});
+        })
     });
-
-
     return io;
 
 }
