@@ -201,12 +201,12 @@
     <button id="btn-logout" class="submit-button" onclick="window.location.href=\'index.html\';">SAIR DO JOGO</button>\
   </div>\
 \
-  <div class="btn-group" style="width: 80%; margin-left: 50%">\
-    <button id="energyCount" style="width:25%; margin-left: 60px">\
-      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+<div id ="widgetBar" class="widgetBar" >\
+    <button id="energyCount" class ="widgetStatus"  ><h1 id="energyCountText" class = "widgetText">000</h1>\
+      <img  class = "widgetIcon" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/flash1.png">\
     </button>\
-    <button id="coinCount" style="width:25%; margin-left: 60px">\
-      <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin.png" style="cursor: default; width: 100%; display: block; margin-left: auto; margin-right: auto">\
+    <button id="coinCount" class ="widgetStatus" ><h1 id="coinCountText" class = "widgetText">9999</h1>\
+      <img  class = "widgetIcon" src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/coin1.png">\
     </button>\
   </div>\
 \
@@ -354,7 +354,7 @@
   const join = {
     template: '\
     \
-   <form class="search-modal-content animate">\
+   <div class="search-modal-content animate">\
     <div class="imgcontainer">\
       <strong>\
         <h3 class="search-title">BUSCAR PARTIDA</h3>\
@@ -371,7 +371,7 @@
                \
       <button onclick="JoinRoom()">PROCURAR</button>       \
     </div>\
-  </form>\
+  </div>\
         '
   }
   const errorPage = {
@@ -609,12 +609,12 @@
     }
     pricing = parseInt(document.getElementById("pricingTheme").value.replace(" G$", ""))
     console.log({
-      'user': vm.user,
+      'user': vm.username,
       'coins': vm.coins,
       'skins': buyingList
     })
     socket.emit('purchase', {
-      'user': vm.user,
+      'user': vm.username,
       'coins': vm.coins,
       'skins': buyingList
     })
@@ -646,8 +646,10 @@
   }
 
   function updateWidgets() {
-    document.getElementById("coinCount").value = vm.coins;
-    document.getElementById("energyCount").value = vm.energy;
+    var energyCount = document.getElementById("energyCountText"); 
+    var coinCount = document.getElementById("coinCountText"); 
+    coinCount.innerHTML =vm.coins.toString().padStart(4,'0')
+    energyCount.innerHTML =vm.energy.toString().padStart(3,'0')
   }
 
   function checkRooms() {
