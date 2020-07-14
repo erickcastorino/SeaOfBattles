@@ -139,8 +139,7 @@
   }
   const loginPage = {
     template: '\
-    <div>\
-       <form id="loginForm" class="modal-content animate" >\
+       <div id="loginForm" class="modal-content animate" >\
         <div class="imgcontainer">\
             <router-link to="/">\
                 <span class="close">&times;</span>\
@@ -156,17 +155,16 @@
           <button type="button" onclick="login()" >ENTRAR</button>\
     \
         \
-            <button type="button"  class="submit-button">CADASTRE-SE</button>\
+            <button type="button" onclick="router.push(\'/signUpPage\'\) ">CADASTRE-SE</button>\
         \
         </div>\
-      </form>\
     </div>\
     '
   }
 
   const signUpPage = {
     template: '\
-    <form class="modal-content animate">\
+    <div class="modal-content animate">\
         <div class="imgcontainer">\
           <router-link to="/loginPage"><span class="close">&times;</span></router-link>\
           <img src="https://raw.githubusercontent.com/erickcastorino/SeaOfBattles/master/Assets/imgs/captain.svg" class="avatar" id="imgClickAndChange" onclick="changeImage()" usemap="#SUB15" />\
@@ -183,7 +181,7 @@
     \
           <button onclick="signUp()" >CONFIRMAR</button>\
         </div>\
-      </form>'
+      </div>'
   }
 
   const mainPage = {
@@ -519,6 +517,7 @@
 
   function signUp() { //Falar com fábio pq deu erro de user nulo
     var socket = io();
+    console.log('teste')
     socket.emit('signIn', {
       username: document.getElementById('signInUsername').value,
       password: document.getElementById('signInPassword').value,
@@ -526,6 +525,7 @@
       nickname: document.getElementById('signInNickname').value
     })
     socket.on('signIn', function (res) {
+      console.log(res.status)
       if (status == 'erro') {
         alert('Erro: '.concat(msg))
       } else {

@@ -13,7 +13,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         listOfRooms.findOne({'listOfRooms':'listOfRooms'},function(err,res){
             list=res.list
             room=list.find(room => room.roomName===roomName)
-            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:[...res.list.pop(room)]}})
+            list.pop(room)
+            listOfRooms.update({'listOfRooms':'listOfRooms'},{$set:{list:list}})
         })
     }
     var setInProgress=function(roomName){
@@ -385,7 +386,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
                         rooms.remove({"players.id": socket.id}, function(err, nr) {
 
                         });
-                        removeRoomsList
+                        removeRoomsList(res.room)
                     } else {
 
                         rooms.update({"players.id": socket.id}, {$pull: {"players" : {id: socket.id}}}, function(err, nchanged) {
@@ -419,7 +420,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
             users.findOne({'username':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
                     users.update({'username':obj.username}, {$set: { nickname: obj.nickname, email: obj.email }}, function(err, res){
-                        socket.emit('updateUser', {nickname:obj.nickname, email:obj.nickname})
+                        socket.emit('updateUser', {nickname:obj.nickname, email:obj.email})
                     })
                 }
             })
@@ -478,13 +479,15 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
                     socket.emit('signIn', {status: 'erro', msg: 'Usuário já cadastrado'})
                 }
 				else{
-					const data = {...obj,coins:50,skins:[],energy:10}
-					users.insert({data}, function(err, res){
+                    const data = {username:obj.userName,email:obj.email,nickname:obj.nickname,password:obj.password ,coins:50,skins:[],energy:10}
+					users.insert({...data}, function(err, res){
 						socket.emit('signIn', {status: 'sucesso', msg: 'Usuário cadastrado com sucesso'})
-					});
+                    });
+                    users.findOne({'userName':obj.userName},function(error,res){console.log(res)})
 				}			
             });
         })
+
         socket.on('addEnergy', function(obj){
             users.update({'username': obj.username}, {$set: {energy: 10}}, function(err, res) {
             })
