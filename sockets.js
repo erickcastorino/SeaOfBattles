@@ -470,8 +470,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         })
 
         socket.on('signIn', function(obj){
-            users.findOne({'username':obj.username},function(err, res){				
-                if(obj.username===res.username){
+            users.findOne({'username':obj.username},function(err, res){	
+                if(!(res==null ||res==undefined)){
                     socket.emit('signIn', {status: 'erro', msg: 'Usuário já cadastrado'})
                 }
 				else{
@@ -484,8 +484,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         })
         socket.on('addEnergy', function(obj){
             users.update({'username': obj.username}, {$set: {energy: 10}}, function(err, res) {
+            
             })
-
             socket.emit('updateEnergy',{energy: 10});
         })
     });
