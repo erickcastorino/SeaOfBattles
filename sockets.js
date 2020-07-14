@@ -144,7 +144,7 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
 /*
     console.log('Inicia o banco')
     var players=[];
-    var p1={username:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["florestal","inferno"],energy:10}
+    var p1={username:"Player2",password:"12345",nickname:"P2",coins:3500,email:"p2@gmail.com",skins:["floresta","infernal"],energy:10}
     var p2={username:"Player1",password:"12345",nickname:"P1",coins:1000,email:"p1@gmail.com",skins:[],energy:10}
     players.push(p1,p2);
     
@@ -405,12 +405,12 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
             users.findOne({'username':obj.username},function(err, res){
                 
                 if(res==null ||res==undefined){
-                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
+                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skins:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
                 }
                 else if(obj.password===res.password){
-                    socket.emit('login', {error:false,username:res.username, nickname:res.nickname, coins:res.coins, skin:res.skins,energy:res.energy, email:res.email,message:'loged'})
+                    socket.emit('login', {error:false,username:res.username, nickname:res.nickname, coins:res.coins, skins:res.skins,energy:res.energy, email:res.email,message:'loged'})
                 }else{
-                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skin:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
+                    socket.emit('login', {error:true,username:'', nickname:'', coins:0, skins:[], email:'',energy:0 , message:'usuario e/ou senha invalidos'})
                 }
             });
         });
@@ -428,10 +428,10 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         socket.on('purchase', function(obj){
             users.findOne({'user':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
-                    const newSkins=[...res.skins, ...obj.skin];
+                    const newSkins=[...res.skins, ...obj.skins];
                     users.update({'username':obj.username}, {$set:{skins:newSkins}}, function(err, res){
                     })
-                    payload= removeCoin(obj.coins);
+                    removeCoin(obj.coins);
                     users.findOne({'username':obj.username},function(err, res){
                         socket.emit('purchase', {coins: res.coins, skins:res.skins, ...payload});  
                     })
@@ -484,7 +484,6 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         })
         socket.on('addEnergy', function(obj){
             users.update({'username': obj.username}, {$set: {energy: 10}}, function(err, res) {
-            
             })
             socket.emit('updateEnergy',{energy: 10});
         })
