@@ -4,8 +4,8 @@
   "description": "Multiplayer battleship",
   "main": "app.js",
   "scripts": {
-    "postinstall": "./node_modules/bower/bin/bower install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "bower cache clean && bower install",
+  "start": "node app.js"
   },
   "author": "Arend van Erk",
   "license": "GNU",
