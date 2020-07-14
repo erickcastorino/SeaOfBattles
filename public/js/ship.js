@@ -70,7 +70,7 @@ socket.on('opponentReady', function() {
 
 socket.on('win', function() {
     if(vm.coinsEnabled){
-        socket.emit('addCredit',{user:vm.user,coins:50});
+        socket.emit('addCredit',{username:vm.username,coins:50});
         socket.on('addCredit',function(obj){vm.coins=obj.coins})
         alert('Você venceu!!!!');
     }
@@ -79,7 +79,7 @@ socket.on('win', function() {
 socket.on('takeFire', function(obj) {
 
     if (obj.opponent.takenHits == obj.opponent.locations.length) {
-        socket.emit('addCredit',{user:vm.user,coins:20});
+        socket.emit('addCredit',{username:vm.username,coins:20});
         socket.on('addCredit',function(obj){vm.coins=obj.coins})
         alert('VOCÊ PERDEU!');
     }
