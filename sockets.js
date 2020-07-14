@@ -170,8 +170,8 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         users.findOne({"username":username},function(err, res){
             if(!(res==null ||res==undefined)){
                 users.update({"username":res.username}, {$set:{coins:parseInt(res.coins) - parseInt(val)}},function(err, res){            
-                    console.log('New coin:', res.coins);            
                 });
+                console.log('New coin:', res.coins);            
             }
         });        
     };
@@ -428,15 +428,18 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
         socket.on('purchase', function(obj){
             users.findOne({'user':obj.username},function(err, res){
                 if(!(res==null ||res==undefined)){
+                    console.log("Old Skins", res.skins)
                     const newSkins=[...res.skins, ...obj.skins];
-                    users.update({'username':obj.username}, {$set:{skins:newSkins}}, function(err, res){
+                    console.log("New Skins",newSkins)
+                    users.update({'username':obj.username}, {$set:{skins: newSkins}}, function(err, res){
                     })
                     removeCoin(obj.coins);
                     users.findOne({'username':obj.username},function(err, res){
-                        socket.emit('purchase', {coins: res.coins, skins:res.skins, ...payload});  
+                        console.log(res.skins)
+                        socket.emit('purchase', {coins: res.coins, skins:res.skins, status:'success', message: 'OK' });  
                     })
                 }else{
-                 socket.emit('purchase', {coins:0, skins:[],status:'failed', message: 'falhou' });
+                 socket.emit('purchase', {coins:0, skins:[], status:'failed', message: 'falhou' });
                 }
             })
         });
