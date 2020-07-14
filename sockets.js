@@ -492,8 +492,11 @@ module.exports.listen = function(http, rooms, users, listOfRooms) {
 
         socket.on('addEnergy', function(obj){
             users.update({'username': obj.username}, {$set: {energy: 10}}, function(err, res) {
+                removeCoin(obj.userName,500);
+                users.findOne({'username': obj.username},function(err,res){
+                    socket.emit('updateEnergy',{energy: 10, coins:res.coins});
+                })
             })
-            socket.emit('updateEnergy',{energy: 10});
         })
     });
     return io;
