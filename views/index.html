@@ -226,7 +226,7 @@
   </div>\
   <div id="background-modal" style="display: none;">\
     <!------------- MODAL EDITAR PERFIL ------------->\
-    <form id="profile-modal-content" class="animate" action="ACAO-DE-EDITAR-PERFIL.py" method="post"\
+    <div id="profile-modal-content" class="animate" action="ACAO-DE-EDITAR-PERFIL.py" method="post"\
       style="display: none">\
 \
       <div class="imgcontainer-store" style="width: 80%;">\
@@ -242,19 +242,16 @@
 \
         <div class="container">\
 \
-          <input type="text" class="profile-submit" placeholder="n i c k n a m e" name="nickname" minlength="4"\
+          <input type="text" class="profile-submit" placeholder="n i c k n a m e" id="newnickname" name="newnickname" minlength="4"\
             required>\
 \
-          <input type="password" class="profile-submit" placeholder="s e n h a   a t u a l" name="psw" minlength="8"\
+          <input type="emil" class="profile-submit" placeholder="email" id="newemail" name="newemail" minlength="8"\
             required>\
 \
-          <input type="password" class="profile-submit" placeholder="n o v a   s e n h a" name="npsw" minlength="8"\
-            required>\
-\
-          <button type="submit" class="submit-button">GRAVAR</button>\
+          <button type="button" onClick="updateUser()">GRAVAR</button>\
         </div>\
       </div>\
-    </form>\
+    </div>\
     <!------------- MODAL LOJA DE BATALHA ------------->\
     <div id="store-modal"\
       style="display:none; min-width: 60%; max-height: 48%;">\
@@ -715,6 +712,17 @@ function fillEnergy() {
       
 
   }
+
+    function updateUser(){
+      socket.emit('updateUser',{username:vm.username,email:document.getElementById("newemail").value,nickname:document.getElementById("newnickname").value})
+      vm.email = document.getElementById("newemail").value
+      vm.nickname = document.getElementById("newnickname").value
+      socket.on('updateUser',function(res){
+        console.log(res.nickname)
+      })
+    
+    }
+
 </script>
 <script type="text/javascript" src="/vue/dist/vue.js"></script>
 <script type="text/javascript" src="/js/ship.js"></script>
